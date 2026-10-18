@@ -8,7 +8,7 @@ export interface ResolvedModel {
   reasoning?: ThinkingLevel
 }
 
-function customModel(id: string, api: Api, provider: string, baseUrl: string): Model<Api> {
+function customModel(id: string, api: Api, provider: string, baseUrl: string, maxTokens = 16_000): Model<Api> {
   return {
     id,
     name: id,
@@ -19,9 +19,12 @@ function customModel(id: string, api: Api, provider: string, baseUrl: string): M
     input: ['text'],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     contextWindow: 128_000,
-    maxTokens: 16_000,
+    maxTokens,
   }
 }
+
+/** Adaptive thinking counts toward `max_tokens`, and a grouping of a large diff is long: room for both. */
+const CLAUDE_MAX_TOKENS = 64_000
 
 /** OpenAI models that reason unless told not to: gpt-5.4 and later, gpt-6 and later. */
 const REASONS_BY_DEFAULT = /(?:^|\/)gpt-(?:5\.(?:[4-9]|\d{2,})|[6-9]|\d{2,})(?:[.-]|$)/
@@ -60,12 +63,12 @@ export function resolveModel(llm: LlmSettings): ResolvedModel | undefined {
 
     case 'gateway':
       return llm.gatewayToken
-        ? { model: customModel(llm.gatewayModel, 'anthropic-messages', 'vercel-ai-gateway', 'https://ai-gateway.vercel.sh'), apiKey: llm.gatewayToken }
+        ? { model: customModel(llm.gatewayModel, 'anthropic-messages', 'vercel-ai-gateway', 'https://ai-gateway.vercel.sh', CLAUDE_MAX_TOKENS), apiKey: llm.gatewayToken }
         : undefined
 
     case 'anthropic':
       return llm.anthropicApiKey
-        ? { model: customModel(llm.anthropicModel, 'anthropic-messages', 'anthropic', 'https://api.anthropic.com'), apiKey: llm.anthropicApiKey }
+        ? { model: customModel(llm.anthropicModel, 'anthropic-messages', 'anthropic', 'https://api.anthropic.com', CLAUDE_MAX_TOKENS), apiKey: llm.anthropicApiKey }
         : undefined
 
     case 'openai-compatible':

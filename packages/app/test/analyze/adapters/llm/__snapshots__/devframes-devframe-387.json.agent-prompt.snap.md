@@ -1,6 +1,6 @@
-PR title: fix(hub-ui): initialize dock page scripts before activation
+Title: fix(hub-ui): initialize dock page scripts before activation
 
-PR link: https://github.com/devframes/devframe/pull/387
+Link: https://github.com/devframes/devframe/pull/387
 
 ---DESCRIPTION---
 ## Background (Why)

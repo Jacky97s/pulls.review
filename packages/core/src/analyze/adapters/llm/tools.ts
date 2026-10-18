@@ -78,7 +78,7 @@ export function createReadDiffsTool(diff: DiffsPayload, ledger: AnalysisLedger):
   return {
     name: 'read_diffs',
     label: 'Read diffs',
-    description: 'Returns the diffs of the given manifest paths.',
+    description: 'Returns the diffs of the given manifest paths as unified-diff text. Paths must appear in the manifest; an unknown path fails the whole call. One call returns at most about 40,000 characters: paths past the limit are listed as not returned, to request again, and a single larger diff is cut off. A path already returned in this analysis comes back as "(already shown above)", and [generated], [binary] or too-large files return only their header line.',
     parameters: toJsonSchema(ReadDiffsParamsSchema) as Tool['parameters'],
     execute: async (_toolCallId, rawParams) => {
       const parsed = v.safeParse(ReadDiffsParamsSchema, rawParams)
@@ -171,7 +171,7 @@ export function createSubmitGroupingTool(diff: DiffsPayload, ledger: AnalysisLed
   return {
     name: 'submit_grouping',
     label: 'Submit grouping',
-    description: 'Submit the final grouping and overall summary.',
+    description: 'Submits the final grouping and overall summary, ending the analysis. Every manifest path must appear in exactly one group or child: a grouping that omits or repeats a path returns an error naming those paths, to fix and submit again. File and line notes must point at paths in their own group.',
     parameters: toJsonSchema(AnalysisSchema) as Tool['parameters'],
     prepareArguments: prepareGroupingArguments,
     execute: async (_toolCallId, rawParams) => {
@@ -198,7 +198,7 @@ export function createSubmitGroupingTool(diff: DiffsPayload, ledger: AnalysisLed
 
 export const UPDATE_GROUPING_DECLARATION: Tool = {
   name: 'update_grouping',
-  description: 'Replace the current grouping and overall summary. Call only when the user asks to change the grouping.',
+  description: 'Replaces the current grouping and overall summary with a complete new one, shown to the reviewer at once. Call only when the user asks to change the grouping. Every manifest path must appear in exactly one group or child; an invalid grouping returns an error naming the problem and changes nothing.',
   parameters: toJsonSchema(AnalysisSchema) as Tool['parameters'],
 }
 

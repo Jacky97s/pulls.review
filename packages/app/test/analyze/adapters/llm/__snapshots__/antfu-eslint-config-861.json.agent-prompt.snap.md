@@ -1,6 +1,6 @@
-PR title: feat: add antislop option
+Title: feat: add antislop option
 
-PR link: https://github.com/antfu/eslint-config/pull/861
+Link: https://github.com/antfu/eslint-config/pull/861
 
 ---DESCRIPTION---
 ## Description

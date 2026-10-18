@@ -1,6 +1,6 @@
-PR title: perf(reactivity): ports `alien-signals` 0.4.4
+Title: perf(reactivity): ports `alien-signals` 0.4.4
 
-PR link: https://github.com/vuejs/core/pull/12349
+Link: https://github.com/vuejs/core/pull/12349
 
 ---DESCRIPTION---
 `alien-signals`(https://github.com/stackblitz/alien-signals) is a research-oriented signal library rewritten based on Vue 3.4's reactivity system. It sets several constraints to ensure the high-performance implementation of a reactivity system. (Currently, it is the fastest implementation among all signal libraries)

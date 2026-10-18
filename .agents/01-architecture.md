@@ -10,13 +10,13 @@ plans (and any future work) MUST follow.
 
 ## Layout
 
-A pnpm workspace of three packages (`plans/08-core-and-cli.md`):
+A pnpm workspace of four packages (`plans/08-core-and-cli.md`):
 
 - `packages/app` — the SPA and the github.com embed (Vite + Vue). Paths
   below written as `app/…` live in `packages/app/src/`.
 - `packages/core` (`@pulls.review/core`) — everything runtime-agnostic,
   exposed as subpaths rather than one barrel: `/types`, `/patch-parser`,
-  `/github`, `/paste`, `/cache` (persistence repositories), `/analyze` (rule-based/none adapters, LLM settings and
+  `/github`, `/gitlab`, `/paste`, `/cache` (persistence repositories), `/analyze` (rule-based/none adapters, LLM settings and
   model resolution), `/llm` (the agent runtime and SDKs), `/diagnostics`,
   `/locales`. Built with tsdown; the app resolves `@pulls.review/core/*` to
   source through a Vite alias. Core MUST load
@@ -51,7 +51,8 @@ A pnpm workspace of three packages (`plans/08-core-and-cli.md`):
   user already signed into, run by the user's own `pulls.review` process. This rules out anything that needs a
   server to keep a secret. The site does everything in the browser; the CLI
   does the same work in the user's own CI with the user's own secrets.
-- The app MUST build as a static SPA and deploy as static files, on Vercel.
+- The app MUST build as a static SPA and deploy as static files: on Vercel, or
+  self-hosted from the `Dockerfile` (nginx with the same fallback).
   `vercel.json` carries a catch-all rewrite to `/index.html` so the dynamic
   routes under `/gh/...` work on direct navigation/refresh, not
   just client-side routing after landing on `/`.
@@ -90,6 +91,9 @@ analysis strategy later never touches the view layer:
   (`core/github`), shared by the site's URL box and the CLI's argument. `Credentials.githubToken()` is read
   per request, so a token saved later applies without rebuilding a store.
   Implementations (`core/providers/`):
+  - `gitlab-mr` / `gitlab-compare` / `gitlab-commit` (`createGitlabSource`) — GitLab
+    REST v4 on gitlab.com or any self-hosted instance; `host` is part of every ref
+    and key, and `Credentials.gitlabToken(host)` is per instance (`plans/12-gitlab-provider.md`).
   - `github-pr` (`createGithubPullRequestSource`) — GitHub REST API (PR
     metadata + paginated file list/patches) through one `GithubClient`.
   - `github-compare` / `github-commit` (`createGithubCompareSource`,
