@@ -56,6 +56,20 @@ GITHUB_TOKEN=... ANTHROPIC_API_KEY=... npx @pulls.review/actions owner/repo#123
 
 Every variable also has a `PULLS_REVIEW_*` form that takes precedence (`PULLS_REVIEW_GITHUB_TOKEN`, `PULLS_REVIEW_PROVIDER`, `PULLS_REVIEW_API_KEY`, `PULLS_REVIEW_MODEL`, `PULLS_REVIEW_BASE_URL`, `PULLS_REVIEW_LOCALE`); `npx @pulls.review/actions --help` lists everything.
 
+## Self-host with Docker
+
+The site is a static SPA with no backend, so it deploys as one nginx container:
+
+```bash
+VITE_GITLAB_OAUTH_CLIENTS=gitlab.example.com=<application id> \
+GIT_SHA=$(git rev-parse --short HEAD) PORT=8080 \
+docker compose up -d --build
+```
+
+- `VITE_GITLAB_OAUTH_CLIENTS` (optional): `host=id` pairs, comma-separated, for "Sign in with GitLab". Register the application on that instance as **not confidential**, scope `api`, redirect URI `https://<this site>/oauth/gitlab`. It is built into the bundle, so rebuild after changing it.
+- Without it, users paste a personal access token per instance in Settings → GitLab.
+- The browser calls each GitLab instance directly, so the instance must allow CORS from this site (GitLab's API does by default).
+
 ## Packages
 
 | Package                                       | What it is                                                                                      |

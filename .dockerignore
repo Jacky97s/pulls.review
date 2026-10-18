@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+.git
+.env*
+.commandcode
+.continue
+.devin
+.grok
+.hermes
+.kiro
+.pi
+.trae
+skills
