@@ -15,6 +15,41 @@ Pull request review made simple. Groups changed files, summarizes what matters, 
 
 To use pulls.review on the website, simply visit [pulls.review](https://pulls.review) and follow the instructions to connect your GitHub account and start reviewing pull requests directly in your browser.
 
+## Review tips
+
+**Find your way in**
+
+- **Paste any link.** The box on the home page takes a GitHub pull request, compare or commit URL, `owner/repo#123`, or a GitLab merge request, compare, commit or project URL from gitlab.com or a self-hosted instance (`group/project!123` for gitlab.com). A repository or project URL opens its list of open requests.
+- **Start with the first group.** Groups are ordered by review priority: the core change first, supporting changes next, mechanical changes (lockfiles, generated files, formatting) last. Read one group end to end before moving on.
+- **Look for "Review carefully".** AI analysis marks the groups, files and lines that deserve extra care - security, data loss, hard-to-revert changes. Read those first, then the file and line notes, which explain what you would otherwise have to work out yourself.
+
+**Choose the analysis**
+
+- **Rules or AI.** _Rules_ groups by file path, instantly and for free. _AI_ groups by intent and adds summaries and notes; set a model in Settings → AI Analysis. Switch between them from the header at any time.
+- **Ask, or regroup.** After an AI analysis, use the chat to ask about the change ("why does this touch the cache?", "what breaks if this is reverted?"), or to reshape it ("put the migration in its own group"); the grouping updates in place.
+- **Share the analysis.** _Share result_ posts it as a comment (GitHub) or note (GitLab) on the request. Teammates who open the request load it from there instead of running a model again; a link with `?from=<user>` opens someone's shared analysis directly.
+
+**Keep your place**
+
+- **Mark files reviewed.** Tick the box on a file (or a whole folder in the file tree) once you've read it: it collapses, and the progress ring shows how far you are. _Review progress_ can mark everything, reset, or invert.
+- **Re-review only what changed.** When new commits arrive, a reviewed file that changed is flagged "changed since review" - everything else stays done.
+- **Step through commits.** For a request built as a series of focused commits, the commit selector shows one commit at a time; _Back to all changes_ returns to the whole diff.
+
+**Comment like on GitHub or GitLab**
+
+- **Comment on a range.** Drag across line numbers to select lines, then click **+**. The composer shows the lines it covers, and hovering a range thread highlights them in the diff.
+- **Batch your comments.** _Start a review_ keeps comments pending until you submit them with Comment, Approve or Request changes, as on the host itself. `⌘/Ctrl + Enter` submits a comment or reply.
+- **Write access.** Comments need a GitHub token with write access, or a GitLab token or sign-in with the `api` scope; with read-only access the threads stay visible but the composer is hidden.
+
+**Read the code, not just the hunk**
+
+- **Expand context.** Click "N unmodified lines" to see what surrounds a hunk, or load the full file from the file header. Files GitLab collapses for size load as you scroll to them.
+- **Pick the layout.** Split or unified view, line wrapping and the syntax theme are in Settings → Appearance. A file that only adds or only removes lines, or a narrow window, always shows unified.
+
+**Review before you push**
+
+- Run the CLI (`packages/cli`) in a repository to review local work the same way: with no argument it opens the current branch against the default branch, `--worktree` opens uncommitted changes, and a request URL opens that request with the token from `gh` or `glab`.
+
 ## Use in GitHub
 
 You can optionally install userscript to enhance the GitHub interface with pulls.review features.
