@@ -6,6 +6,6 @@
     <span>·</span>
     <span>MIT</span>
     <span>·</span>
-    <a href="https://github.com/antfu/pulls.review" target="_blank" rel="noopener" class="transition hover:color-base hover:op100">GitHub</a>
+    <a href="https://github.com/Jacky97s/pulls.review" target="_blank" rel="noopener" class="transition hover:color-base hover:op100">GitHub</a>
   </footer>
 </template>

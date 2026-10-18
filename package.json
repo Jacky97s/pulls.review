@@ -11,9 +11,9 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git"
+    "url": "git+https://github.com/Jacky97s/pulls.review.git"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "scripts": {
     "build": "pnpm -r run build",
     "dev": "pnpm -F @pulls.review/app run dev",

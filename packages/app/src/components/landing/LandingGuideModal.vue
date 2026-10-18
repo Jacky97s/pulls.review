@@ -24,7 +24,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: antfu/pulls.review@main
+      - uses: Jacky97s/pulls.review@main
         with:
           api-key: \${{ secrets.VERCEL_AI_GATEWAY_API_KEY }}`
 
@@ -112,7 +112,7 @@ npx pulls.review --worktree  # uncommitted changes, new files included`
               <code class="rounded bg-code px-1 text-[0.85em]">locale</code>
             </template>
             <template #readme>
-              <ExternalLink href="https://github.com/antfu/pulls.review#analyze-pull-requests-from-ci-experimental">
+              <ExternalLink href="https://github.com/Jacky97s/pulls.review#analyze-pull-requests-from-ci-experimental">
                 README
               </ExternalLink>
             </template>

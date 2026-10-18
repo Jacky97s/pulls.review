@@ -41,7 +41,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: antfu/pulls.review@main
+      - uses: Jacky97s/pulls.review@main
         with:
           api-key: ${{ secrets.VERCEL_AI_GATEWAY_API_KEY }}
 ```

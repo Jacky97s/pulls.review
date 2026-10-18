@@ -49,7 +49,7 @@ export async function buildUserscript() {
 // @run-at       document-idle
 // @updateURL    https://pulls.review/pulls-review-github.user.js
 // @downloadURL  https://pulls.review/pulls-review-github.user.js
-// @supportURL   https://github.com/antfu/pulls.review/issues
+// @supportURL   https://github.com/Jacky97s/pulls.review/issues
 // @homepageURL  https://pulls.review
 // ==/UserScript==
 

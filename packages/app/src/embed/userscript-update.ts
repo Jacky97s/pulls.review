@@ -6,7 +6,7 @@ import { SITE_ORIGIN } from './githubIntegration'
 
 export const USERSCRIPT_URL = `${SITE_ORIGIN}/pulls-review-github.user.js`
 
-const REPO = 'antfu/pulls.review'
+const REPO = 'Jacky97s/pulls.review'
 const CHECK_INTERVAL = 6 * 60 * 60 * 1000
 
 /**

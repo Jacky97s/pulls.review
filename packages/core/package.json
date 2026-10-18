@@ -9,10 +9,10 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git",
+    "url": "git+https://github.com/Jacky97s/pulls.review.git",
     "directory": "packages/core"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "sideEffects": false,
   "exports": {
     "./types": "./dist/types.js",
