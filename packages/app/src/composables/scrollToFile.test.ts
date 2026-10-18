@@ -72,4 +72,30 @@ describe('scrollToAnchor', () => {
     window.dispatchEvent(new Event('scrollend'))
     expect(anchor.scrollIntoView).toHaveBeenCalledTimes(2)
   })
+
+  it.each(['wheel', 'touchmove', 'keydown', 'pointerdown'])('stops re-aiming once the user scrolls (%s)', (type) => {
+    const anchor = document.createElement('section')
+    anchor.getBoundingClientRect = () => ({ top: 3000 }) as DOMRect
+    anchor.scrollIntoView = vi.fn()
+    document.body.append(anchor)
+
+    scrollToAnchor(anchor)
+    window.dispatchEvent(new Event(type))
+    window.dispatchEvent(new Event('scrollend'))
+    expect(anchor.scrollIntoView).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives up after a few seconds, so a later scroll is never pulled back', () => {
+    vi.useFakeTimers()
+    const anchor = document.createElement('section')
+    anchor.getBoundingClientRect = () => ({ top: 3000 }) as DOMRect
+    anchor.scrollIntoView = vi.fn()
+    document.body.append(anchor)
+
+    scrollToAnchor(anchor)
+    vi.advanceTimersByTime(10_000)
+    window.dispatchEvent(new Event('scrollend'))
+    expect(anchor.scrollIntoView).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+  })
 })
