@@ -49,6 +49,7 @@ const isDark = inject(isDarkKey, globalIsDark)
 const virtualizer = inject(diffVirtualizerKey, undefined)
 
 const containerRef = useTemplateRef<HTMLDivElement>('container')
+const truncatedRef = useTemplateRef<HTMLDivElement>('truncated')
 // Standalone (stories) there's no `DiffsPage` providing it, so state stays local.
 const collapseState = inject(fileCollapseKey, () => reactive(new Map<string, boolean>()), true)
 const collapsed = computed({
@@ -134,6 +135,15 @@ watch([nearViewport, autoFetchFullFile], ([near, enabled]) => {
   if (canLoadFullFile.value && needsFullFileToHighlight(props.file))
     loadFullFile()
 })
+
+// A truncated file has no diff to show until its content loads, so it loads once it
+// nears the viewport - one file at a time as the reader scrolls, never all up front.
+const { stop: stopTruncatedLoad } = useIntersectionObserver(truncatedRef, ([entry]) => {
+  if (!entry?.isIntersecting || !canLoadFullFile.value)
+    return
+  stopTruncatedLoad()
+  loadFullFile()
+}, { rootMargin: '600px 0px' })
 
 // Container width, tracked for `effectiveLayout` below - a `ResizeObserver` rather than
 // a viewport-width media query since this is per-file-diff container width (the sidebar/
@@ -331,7 +341,11 @@ watch(
     if (!fileDiff || !containerRef) {
       return
     }
-    instance?.render({
+    // The container only appears once a truncated file's content loads: nothing mounted
+    // into it yet, so this is the first render rather than an update.
+    if (!instance)
+      return mount()
+    instance.render({
       fileDiff,
       fileContainer: containerRef,
       lineAnnotations: lineAnnotations.value.map(annotation => ({ ...annotation })),
@@ -420,8 +434,11 @@ defineExpose({
     <div v-if="file.isBinary" class="p-4 text-sm op-fade">
       {{ $t('file.binaryNotShown') }}
     </div>
-    <div v-else-if="file.truncated && !fullFileLoaded" class="p-4 text-sm op-fade">
-      {{ $t('file.tooLarge') }}
+    <div v-else-if="file.truncated && !fullFileLoaded" ref="truncated" class="flex flex-wrap items-center gap-2 p-4 text-sm">
+      <span class="op-fade">{{ fullFileError?.message ?? $t('file.tooLarge') }}</span>
+      <ActionButton v-if="canLoadFullFile" size="sm" :loading="isLoadingFullFile" @click="loadFullFile">
+        {{ $t('file.loadFull') }}
+      </ActionButton>
     </div>
     <div v-else ref="container" :class="status === 'changed' ? 'mb--2' : 'my--2'">
       <!--

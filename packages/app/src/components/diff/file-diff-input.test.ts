@@ -82,3 +82,17 @@ describe('needsFullFileToHighlight', () => {
     expect(needsFullFileToHighlight(fileChange({ truncated: true, hunks: [] }))).toBe(false)
   })
 })
+
+describe('buildFileDiff for a truncated file', () => {
+  const truncated: FileChange = { path: 'a.ts', status: 'modified', additions: 0, deletions: 0, isBinary: false, sha: 's', hunks: [], truncated: true }
+
+  it('diffs the two loaded versions itself, since the patch carries no hunks', () => {
+    const diff = buildFileDiff(truncated, { old: 'one\ntwo\n', new: 'one\n2\n' })!
+    expect(diff.hunks.length).toBeGreaterThan(0)
+  })
+
+  it('shows a whole added file once its content loads', () => {
+    const diff = buildFileDiff({ ...truncated, status: 'added' }, { new: 'a\nb\n' })!
+    expect(diff.hunks.length).toBeGreaterThan(0)
+  })
+})
