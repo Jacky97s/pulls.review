@@ -1,20 +1,17 @@
 import { scrollBehavior } from '../state/smooth-scroll'
 
-const MAX_CORRECTIONS = 5
+const MAX_CORRECTIONS = 20
 const TOLERANCE_PX = 2
 
 /**
- * Scrolls (smoothly, unless turned off in Settings) to the non-sticky `[data-file-start]`
- * marker of a file (its own header is sticky, so its rect doesn't follow the file once
- * stuck). Diffs above the target keep growing while the scroll is in flight, so each
- * `scrollend` re-aims until the marker sits at its scroll-margin.
+ * Scrolls (smoothly, unless turned off in Settings) until `anchor` sits at its
+ * scroll-margin. Diffs above it render and grow while the scroll is in flight, so
+ * each `scrollend` re-aims until it lands - by jumping, since another smooth pass would
+ * end short again on a long page.
  */
-export function scrollToFile(root: ParentNode, sha: string) {
-  const marker = root.querySelector(`[data-file-start="${sha}"]`)
-  if (!marker)
-    return
-  const margin = Number.parseFloat(getComputedStyle(marker).scrollMarginTop)
-  const isSettled = () => Math.abs(marker.getBoundingClientRect().top - margin) <= TOLERANCE_PX
+export function scrollToAnchor(anchor: Element) {
+  const margin = Number.parseFloat(getComputedStyle(anchor).scrollMarginTop) || 0
+  const isSettled = () => Math.abs(anchor.getBoundingClientRect().top - margin) <= TOLERANCE_PX
 
   let corrections = 0
   function onScrollEnd() {
@@ -22,11 +19,18 @@ export function scrollToFile(root: ParentNode, sha: string) {
       window.removeEventListener('scrollend', onScrollEnd, { capture: true })
       return
     }
-    marker!.scrollIntoView({ behavior: scrollBehavior.value, block: 'start' })
+    anchor.scrollIntoView({ behavior: 'instant', block: 'start' })
   }
 
   if (isSettled())
     return
   window.addEventListener('scrollend', onScrollEnd, { capture: true })
-  marker.scrollIntoView({ behavior: scrollBehavior.value, block: 'start' })
+  anchor.scrollIntoView({ behavior: scrollBehavior.value, block: 'start' })
+}
+
+/** Scrolls to a file's non-sticky `[data-file-start]` marker: its own header is sticky, so its rect doesn't follow the file once stuck. */
+export function scrollToFile(root: ParentNode, sha: string) {
+  const marker = root.querySelector(`[data-file-start="${sha}"]`)
+  if (marker)
+    scrollToAnchor(marker)
 }
