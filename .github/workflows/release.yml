@@ -5,12 +5,36 @@ on:
     tags:
       - 'v*'
 
+# A GitHub Release instead of npm: the npm names belong to upstream, whose packages
+# lack this fork's GitLab support. Install with
+#   npm i -g https://github.com/Jacky97s/pulls.review/releases/latest/download/pulls.review.tgz
 jobs:
-  release:
-    uses: sxzz/workflows/.github/workflows/release.yml@main
-    with:
-      publish: true
-      build: pnpm --filter '!@pulls.review/app' -r run build
+  cli:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      # The root `prepare` sets up coding-agent skills and fails where no agent is installed.
+      - name: Install
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build
+        run: pnpm -F @pulls.review/core run build && pnpm -F pulls.review run build
+
+      # A fixed asset name, so `releases/latest/download/pulls.review.tgz` always resolves.
+      - name: Pack
+        run: |
+          pnpm -F pulls.review pack --pack-destination "$RUNNER_TEMP"
+          mv "$RUNNER_TEMP"/pulls.review-*.tgz pulls.review.tgz
+
+      - name: Release
+        run: gh release create "$GITHUB_REF_NAME" pulls.review.tgz --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

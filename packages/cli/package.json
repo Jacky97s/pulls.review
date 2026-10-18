@@ -40,17 +40,22 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pulls.review/core": "workspace:^",
+    "@ai-sdk/gateway": "catalog:frontend",
+    "@earendil-works/pi-agent-core": "catalog:frontend",
+    "@earendil-works/pi-ai": "catalog:frontend",
+    "@valibot/to-json-schema": "catalog:frontend",
     "devframe": "catalog:frontend",
+    "diff": "catalog:frontend",
     "h3": "catalog:frontend",
+    "lz-string-es": "catalog:frontend",
+    "nostics": "catalog:frontend",
+    "picomatch": "catalog:frontend",
     "unstorage": "catalog:frontend",
     "valibot": "catalog:frontend"
   },
   "devDependencies": {
-    "@earendil-works/pi-agent-core": "catalog:frontend",
-    "@earendil-works/pi-ai": "catalog:frontend",
+    "@pulls.review/core": "workspace:^",
     "@types/node": "catalog:dev",
-    "@valibot/to-json-schema": "catalog:frontend",
     "tsdown": "catalog:build",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"

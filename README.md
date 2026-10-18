@@ -15,6 +15,26 @@ Pull request review made simple. Groups changed files, summarizes what matters, 
 
 To use pulls.review on the website, simply visit [pulls.review](https://pulls.review) and follow the instructions to connect your GitHub account and start reviewing pull requests directly in your browser.
 
+## Install the CLI
+
+The CLI reviews local git changes, GitHub pull requests and GitLab merge requests from your own machine. Install the latest release (Node.js 20 or later):
+
+```bash
+npm i -g https://github.com/Jacky97s/pulls.review/releases/latest/download/pulls.review.tgz
+```
+
+A specific version is `.../releases/download/v<version>/pulls.review.tgz`. Then run it inside any git repository:
+
+```bash
+pulls.review                    # the current branch against the default branch
+pulls.review --worktree         # uncommitted changes
+pulls.review https://gitlab.example.com/group/project/-/merge_requests/12
+```
+
+It reads GitHub tokens from `GITHUB_TOKEN` or `gh`, and GitLab tokens from `GITLAB_TOKEN` (for the host in `GITLAB_HOST`, default gitlab.com) or `glab`. On first start it prints an auth code that the browser asks for once. `pulls.review --help` lists every option.
+
+To run it from a checkout instead: `pnpm install && pnpm -F @pulls.review/core build && pnpm -F pulls.review build`, then `node packages/cli/bin.mjs`.
+
 ## Review tips
 
 **Find your way in**
@@ -109,12 +129,12 @@ To analyze every GitLab merge request in CI, build the CLI image (`docker build 
 
 ## Packages
 
-| Package                                       | What it is                                                                                      |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`packages/app`](./packages/app)              | The site at [pulls.review](https://pulls.review) and the github.com embed.                      |
-| [`@pulls.review/core`](./packages/core)       | Fetching, parsing, grouping and summarizing diffs - runs in the browser and in Node.            |
-| [`@pulls.review/actions`](./packages/actions) | The CLI the GitHub Action runs.                                                                 |
-| [`pulls.review`](./packages/cli)              | The standalone CLI for reviewing local git changes. Not implemented yet - the name is reserved. |
+| Package                                       | What it is                                                                             |
+| --------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [`packages/app`](./packages/app)              | The site at [pulls.review](https://pulls.review) and the github.com embed.             |
+| [`@pulls.review/core`](./packages/core)       | Fetching, parsing, grouping and summarizing diffs - runs in the browser and in Node.   |
+| [`@pulls.review/actions`](./packages/actions) | The CLI the GitHub Action runs.                                                        |
+| [`pulls.review`](./packages/cli)              | The standalone CLI: local git changes, GitHub pull requests and GitLab merge requests. |
 
 ## Credits
 
