@@ -3,6 +3,7 @@ import type { ResolvedModel } from './model'
 import { createModels, createProvider } from '@earendil-works/pi-ai'
 import { anthropicMessagesApi } from '@earendil-works/pi-ai/api/anthropic-messages.lazy'
 import { openAICompletionsApi } from '@earendil-works/pi-ai/api/openai-completions.lazy'
+import { openAIResponsesApi } from '@earendil-works/pi-ai/api/openai-responses.lazy'
 
 /**
  * Browser CORS preflights fail on headers the endpoint does not allow-list: the SDKs'
@@ -30,8 +31,9 @@ export function createStreamFn(resolved: ResolvedModel): StreamFn {
     api: {
       'anthropic-messages': anthropicMessagesApi(),
       'openai-completions': openAICompletionsApi(),
+      'openai-responses': openAIResponsesApi(),
     },
   }))
   const corsSafeFetch = createCorsSafeFetch(resolved.model.provider)
-  return (model, context, options) => models.streamSimple(model, context, { ...options, fetch: corsSafeFetch })
+  return (model, context, options) => models.streamSimple(model, context, { ...options, reasoning: resolved.reasoning ?? options?.reasoning, fetch: corsSafeFetch })
 }

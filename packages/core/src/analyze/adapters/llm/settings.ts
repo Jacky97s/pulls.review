@@ -22,6 +22,9 @@ export function isLocalAgentName(value: string): value is LocalAgentName {
  * several tokens are configured. `local-agent` needs no key: the `pulls.review`
  * server runs the chosen agent CLI, signed in on its own.
  */
+export const OPENAI_REASONING_LEVELS = ['default', 'off', 'minimal', 'low', 'medium', 'high', 'xhigh'] as const
+export type OpenaiReasoning = typeof OPENAI_REASONING_LEVELS[number]
+
 export interface LlmSettings {
   provider: LlmProvider
   gatewayToken: string
@@ -31,6 +34,8 @@ export interface LlmSettings {
   openaiApiKey: string
   openaiBaseUrl: string
   openaiModel: string
+  /** `default` sends no effort, leaving it to the model; `off` asks for none. */
+  openaiReasoning: OpenaiReasoning
   /** `''` until the user picks one. */
   agent: LocalAgentName | ''
   /** `''` = the agent's own default model. */
@@ -45,7 +50,8 @@ export const defaultLlmSettings: LlmSettings = {
   anthropicModel: 'claude-sonnet-5',
   openaiApiKey: '',
   openaiBaseUrl: 'https://api.openai.com/v1',
-  openaiModel: 'gpt-5.1',
+  openaiModel: 'gpt-6-luna',
+  openaiReasoning: 'default',
   agent: '',
   agentModel: '',
 }

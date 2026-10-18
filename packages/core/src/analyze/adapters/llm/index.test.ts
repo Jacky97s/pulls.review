@@ -72,7 +72,7 @@ describe('resolveModel', () => {
   it('maps each provider setting to a pi-ai model', () => {
     expect(resolveModel({ ...defaultLlmSettings, provider: 'gateway', gatewayToken: 'gw' })).toMatchObject({ apiKey: 'gw', model: { id: 'anthropic/claude-sonnet-5', api: 'anthropic-messages', provider: 'vercel-ai-gateway', baseUrl: 'https://ai-gateway.vercel.sh' } })
     expect(resolveModel({ ...defaultLlmSettings, provider: 'anthropic', anthropicApiKey: 'sk-ant' })).toMatchObject({ apiKey: 'sk-ant', model: { id: 'claude-sonnet-5', api: 'anthropic-messages', provider: 'anthropic', baseUrl: 'https://api.anthropic.com' } })
-    expect(resolveModel({ ...defaultLlmSettings, provider: 'openai-compatible', openaiApiKey: 'sk-oa', openaiBaseUrl: 'https://llm.local/v1' })).toMatchObject({ apiKey: 'sk-oa', model: { id: 'gpt-5.1', api: 'openai-completions', provider: 'openai-compatible', baseUrl: 'https://llm.local/v1' } })
+    expect(resolveModel({ ...defaultLlmSettings, provider: 'openai-compatible', openaiApiKey: 'sk-oa', openaiBaseUrl: 'https://llm.local/v1' })).toMatchObject({ apiKey: 'sk-oa', model: { id: 'gpt-6-luna', api: 'openai-completions', provider: 'openai-compatible', baseUrl: 'https://llm.local/v1' } })
   })
 
   it('is undefined while the selected provider has no token, whatever the others have', () => {
