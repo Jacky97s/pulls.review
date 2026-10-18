@@ -40,11 +40,18 @@ function renderPayload(analysis: SharedAnalysis, compress: boolean): string {
 }
 
 export function renderSharedAnalysisComment(pr: PullRequestRef, login: string, analysis: SharedAnalysis): string {
+  return renderSharedAnalysisBody(`${SITE_ORIGIN}/gh/${pr.owner}/${pr.repo}/${pr.number}?from=${login}`, analysis)
+}
+
+/**
+ * The shared-analysis comment for any host: `link` opens the diff with this analysis
+ * loaded, `subject` is what the host calls the diff. `parseSharedAnalysisComment` reads it.
+ */
+export function renderSharedAnalysisBody(link: string, analysis: SharedAnalysis, subject = 'pull request'): string {
   const { result } = analysis
-  const link = `${SITE_ORIGIN}/gh/${pr.owner}/${pr.repo}/${pr.number}?from=${login}`
   const render = (compress: boolean) => [
     MARKER,
-    `👁️‍🗨️ Review this pull request with grouped, summarized diffs at:`,
+    `👁️‍🗨️ Review this ${subject} with grouped, summarized diffs at:`,
     `👉 ${link}`,
     '',
     `<details><summary>raw result</summary>`,

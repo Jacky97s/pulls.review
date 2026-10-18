@@ -46,6 +46,6 @@ or any self-hosted instance, on the site, the CLI and (later) GitLab CI.
 | S3 | Project MR list at `/gl/{host}/{project}` | browser |
 | S4 | CLI accepts GitLab URLs (any instance, or `group/project!iid`); per host, the token is `PULLS_REVIEW_GITLAB_TOKEN`/`GITLAB_TOKEN` when `GITLAB_HOST` names it (default gitlab.com), else `glab config get token --host` | run the CLI against a gitlab1 MR |
 | S5 | Review threads: diff discussions as threads, the viewer's draft notes as the pending review (negative ids), reply/edit/delete/resolve, submit via `draft_notes/bulk_publish` (`reviewer_state=requested_changes` for request changes) plus `/approve`; unchanged lines carry both `old_line` and `new_line`, ranges a `line_code`. Writes need the `api` scope, which OAuth now requests; `read_api` tokens stay read-only | co-located vitest; a real comment round trip on gitlab1 |
-| S6 | (deferred) Shared analysis as an MR note; GitLab CI job in place of `action.yml` | own plan |
+| S6 | Shared analysis as an MR note (the GitHub comment format, one per user, linking to the deployment: the page's origin, `VITE_SITE_URL`, or `PULLS_REVIEW_SITE_URL` in CI); `pulls-review-actions` takes a GitLab MR or reads `CI_MERGE_REQUEST_IID`; the `actions` Docker target and `deploy/pulls-review.gitlab-ci.yml` run it in merge request pipelines | vitest; the actions image reading a gitlab1 MR (posting not exercised) |
 
 Out of scope: a GitLab embed (browser extension).

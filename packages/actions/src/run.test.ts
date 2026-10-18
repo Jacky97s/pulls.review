@@ -1,8 +1,8 @@
 import type { GroupedResult } from '@pulls.review/core/types'
 import { defaultLlmSettings } from '@pulls.review/core/analyze'
-import { parseSharedAnalysisComment, renderSharedAnalysisComment } from '@pulls.review/core/github'
+import { parseSharedAnalysisComment, renderSharedAnalysisBody, renderSharedAnalysisComment } from '@pulls.review/core/github'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { run } from './run'
+import { run, runGitlab } from './run'
 
 const pr = { owner: 'o', repo: 'r', number: '1' }
 const options = { pr, githubToken: 'ghs_token', llm: { ...defaultLlmSettings, provider: 'anthropic' as const, anthropicApiKey: 'sk' }, locale: 'en' as const, log: () => {} }
@@ -98,5 +98,33 @@ describe('run', () => {
     stubGithub(pullRoutes)
 
     await expect(run({ ...options, llm: defaultLlmSettings }, analyze)).rejects.toMatchObject({ name: 'llmNotConfigured' })
+  })
+})
+
+describe('runGitlab', () => {
+  const mr = { host: 'self.host', project: 'g/p', iid: '5' }
+  const base = '/api/v4/projects/g%2Fp/merge_requests/5'
+  const mrRoutes = {
+    [`GET ${base}`]: { title: 'T', description: '', author: { username: 'dev' }, source_branch: 'f', target_branch: 'main', sha: 'head456', diff_refs: { base_sha: 'b', head_sha: 'head456', start_sha: 's' }, created_at: '', updated_at: '', web_url: 'https://self.host/g/p/-/merge_requests/5', state: 'opened' },
+    [`GET ${base}/diffs`]: [{ old_path: 'a.ts', new_path: 'a.ts', new_file: false, renamed_file: false, deleted_file: false, diff: '@@ -1 +1 @@\n-a\n+b\n' }],
+    [`GET ${base}/commits`]: [],
+    'GET /api/v4/user': { username: 'review-bot' },
+  }
+  const gitlabOptions = { mr, gitlabToken: 'glpat', siteOrigin: 'https://review.internal', llm: options.llm, locale: options.locale, log: () => {} }
+
+  it('posts the analysis as a merge request note linking to the deployment', async () => {
+    const calls = stubGithub({ ...mrRoutes, [`GET ${base}/notes`]: [], [`POST ${base}/notes`]: { id: 42 } })
+    const outcome = await runGitlab(gitlabOptions, analyze)
+    expect(outcome).toEqual({ status: 'posted', url: 'https://self.host/g/p/-/merge_requests/5#note_42' })
+    const post = calls.find(call => call.method === 'POST')!
+    expect((post.body as { body: string }).body).toContain('https://review.internal/gl/self.host/g/p/-/merge_requests/5?from=review-bot')
+    expect(analyze).toHaveBeenCalledOnce()
+  })
+
+  it('leaves its note alone when it already covers the head', async () => {
+    const body = renderSharedAnalysisBody('l', { headSha: 'head456', result })
+    stubGithub({ ...mrRoutes, [`GET ${base}/notes`]: [{ id: 7, body, system: false, author: { username: 'review-bot' }, updated_at: '' }] })
+    expect(await runGitlab(gitlabOptions, analyze)).toEqual({ status: 'up-to-date', url: 'https://self.host/g/p/-/merge_requests/5#note_7' })
+    expect(analyze).not.toHaveBeenCalled()
   })
 })

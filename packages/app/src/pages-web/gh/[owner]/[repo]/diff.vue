@@ -26,12 +26,16 @@ const ref = props.sourceRef
 // `?from=<login>` deep-links a shared analysis (see plans/07); read once, never rewritten.
 const from = typeof route.query.from === 'string' ? route.query.from : undefined
 
+// Shared-analysis notes link readers back here - an internal deployment, for a self-hosted
+// instance. The CLI's own server is no address to share, so it keeps the default.
+const siteOrigin = import.meta.env.VITE_SITE_URL || (import.meta.env.PR_LOCAL ? undefined : location.origin)
+
 function createSource(ref: RoutableRef) {
   switch (ref.kind) {
     case 'gitlab-mr':
     case 'gitlab-compare':
     case 'gitlab-commit':
-      return createGitlabSource(ref, credentials)
+      return createGitlabSource(ref, credentials, { siteOrigin })
     default:
       return createGithubSource(ref, credentials, { tokenMeta: resolveStoredTokenMeta })
   }

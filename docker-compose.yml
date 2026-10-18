@@ -2,6 +2,7 @@ services:
   pulls-review:
     build:
       context: .
+      target: site
       args:
         # e.g. gitlab1.program.com.tw=<Application ID>; the Application's redirect URI
         # must include <this site's origin>/oauth/gitlab.

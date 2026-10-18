@@ -70,6 +70,8 @@ docker compose up -d --build
 - Without it, users paste a personal access token per instance in Settings → GitLab.
 - The browser calls each GitLab instance directly, so the instance must allow CORS from this site (GitLab's API does by default).
 
+To analyze every GitLab merge request in CI, build the CLI image (`docker build --target actions -t <registry>/pulls-review-actions .`), push it to a registry the runners can pull from, and include [`deploy/pulls-review.gitlab-ci.yml`](./deploy/pulls-review.gitlab-ci.yml) - its header lists the CI/CD variables it needs.
+
 ## Packages
 
 | Package                                       | What it is                                                                                      |

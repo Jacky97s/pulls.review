@@ -1,11 +1,13 @@
 import type { LlmSettings } from '@pulls.review/core/analyze'
 import type { PullRequestRef } from '@pulls.review/core/github'
+import type { GitlabMergeRequestRef } from '@pulls.review/core/gitlab'
 import type { runLlmAnalysis } from '@pulls.review/core/llm'
 import type { Locale } from '@pulls.review/core/locales'
-import type { AnalyzeProgress } from '@pulls.review/core/types'
+import type { AnalyzeProgress, DiffSource } from '@pulls.review/core/types'
 import { resolveModel } from '@pulls.review/core/analyze'
 import { diagnostics } from '@pulls.review/core/diagnostics'
 import { ACTIONS_BOT_LOGIN, createGithubPullRequestSource } from '@pulls.review/core/github'
+import { createGitlabMergeRequestSource } from '@pulls.review/core/gitlab'
 import { staticCredentials } from '@pulls.review/core/types'
 
 export interface RunOptions {
@@ -38,24 +40,51 @@ function describeProgress(progress: AnalyzeProgress): string {
  * PR cost no model call.
  */
 export async function run({ pr, githubToken, llm, locale, log }: RunOptions, analyze: typeof runLlmAnalysis): Promise<RunOutcome> {
+  const source = createGithubPullRequestSource(pr, staticCredentials(githubToken))
+  // A workflow's `GITHUB_TOKEN` cannot look itself up at `/user`.
+  return analyzeAndShare(source, `${pr.owner}/${pr.repo}#${pr.number}`, ACTIONS_BOT_LOGIN, { llm, locale, log }, analyze)
+}
+
+export interface GitlabRunOptions extends Omit<RunOptions, 'pr' | 'githubToken'> {
+  mr: GitlabMergeRequestRef
+  /** Needs the `api` scope to post notes; a CI job token cannot. */
+  gitlabToken: string
+  /** Where the note links to: the deployment readers open (default pulls.review). */
+  siteOrigin?: string
+}
+
+/** `run` for a GitLab merge request: the analysis lands as a merge request note. */
+export async function runGitlab({ mr, gitlabToken, siteOrigin, llm, locale, log }: GitlabRunOptions, analyze: typeof runLlmAnalysis): Promise<RunOutcome> {
+  const source = createGitlabMergeRequestSource(mr, staticCredentials(undefined, { [mr.host]: gitlabToken }), { siteOrigin })
+  return analyzeAndShare(source, `${mr.host}/${mr.project}!${mr.iid}`, undefined, { llm, locale, log }, analyze)
+}
+
+async function analyzeAndShare(
+  source: DiffSource,
+  label: string,
+  fallbackLogin: string | undefined,
+  { llm, locale, log }: Pick<RunOptions, 'llm' | 'locale' | 'log'>,
+  analyze: typeof runLlmAnalysis,
+): Promise<RunOutcome> {
   const resolved = resolveModel(llm)
   if (!resolved)
     throw diagnostics.llmNotConfigured()
-
-  const source = createGithubPullRequestSource(pr, staticCredentials(githubToken))
-  const [diff, login, comments] = await Promise.all([
+  const sharing = source.sharing!
+  const [diff, viewer, comments] = await Promise.all([
     source.fetch(),
-    // A workflow's `GITHUB_TOKEN` cannot look itself up at `/user`.
-    source.viewer().then(viewer => viewer?.login ?? ACTIONS_BOT_LOGIN, () => ACTIONS_BOT_LOGIN),
-    source.sharing.list(),
+    source.viewer?.().catch(() => undefined),
+    sharing.list(),
   ])
+  const login = viewer?.login ?? fallbackLogin
+  if (!login)
+    throw new Error('The token cannot identify its user, so its earlier note cannot be found to update.')
   const headSha = diff.head?.sha ?? ''
   const existing = comments.find(comment => comment.login === login)
   if (existing && existing.analysis.headSha === headSha)
     return { status: 'up-to-date', url: existing.url }
 
-  log(`Analyzing ${pr.owner}/${pr.repo}#${pr.number} (${diff.files.length} files) with ${resolved.model.provider}/${resolved.model.id}`)
+  log(`Analyzing ${label} (${diff.files.length} files) with ${resolved.model.provider}/${resolved.model.id}`)
   const { result } = await analyze(diff, resolved, locale, { onProgress: progress => log(describeProgress(progress)) })
-  const comment = await source.sharing.upsert(login, { headSha, result }, existing)
+  const comment = await sharing.upsert(login, { headSha, result }, existing)
   return { status: 'posted', url: comment.url }
 }

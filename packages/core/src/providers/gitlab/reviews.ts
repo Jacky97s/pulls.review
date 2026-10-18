@@ -143,7 +143,7 @@ export function normalizeGitlabReviews(input: {
 }
 
 /** A 403 on a write means the token may not write here, e.g. one with only `read_api`. */
-async function asWrite<T>(task: () => Promise<T>): Promise<T> {
+export async function asWrite<T>(task: () => Promise<T>): Promise<T> {
   try {
     return await task()
   }
