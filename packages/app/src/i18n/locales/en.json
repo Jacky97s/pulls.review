@@ -424,7 +424,7 @@
     "gitlab": {
       "label": "GitLab Personal Access Token",
       "labelFor": "GitLab token for {host}",
-      "hint": "Needs the read_api scope. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "hint": "Needs the read_api scope to read, or api to comment and review. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
       "generate": "Generate one on this instance →",
       "tokenSaved": "Token saved",
       "signIn": "Sign in",
@@ -436,7 +436,7 @@
       "application": "GitLab Application (optional)",
       "applicationId": "Application ID",
       "applicationSaved": "Application saved",
-      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope read_api, redirect URI {redirectUri}.",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope api, redirect URI {redirectUri}.",
       "registerApplication": "Register an application on this instance →"
     }
   },

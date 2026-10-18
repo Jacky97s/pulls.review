@@ -23,7 +23,7 @@ describe('gitlab oauth', () => {
       redirect_uri: 'https://app/oauth/gitlab',
       response_type: 'code',
       state: 'st',
-      scope: 'read_api',
+      scope: 'api',
       code_challenge: 'ch',
       code_challenge_method: 'S256',
     })

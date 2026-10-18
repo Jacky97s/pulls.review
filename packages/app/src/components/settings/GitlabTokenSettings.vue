@@ -75,7 +75,7 @@ function remove(host: string) {
 }
 
 function tokenPageUrl(host: string): string {
-  return `https://${host || GITLAB_CLOUD_HOST}/-/user_settings/personal_access_tokens?name=pulls.review&scopes=read_api`
+  return `https://${host || GITLAB_CLOUD_HOST}/-/user_settings/personal_access_tokens?name=pulls.review&scopes=api`
 }
 
 function applicationPageUrl(host: string): string {

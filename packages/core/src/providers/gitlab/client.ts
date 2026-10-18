@@ -13,8 +13,8 @@ export class GitlabApiError extends Error {
 export interface GitlabClient {
   host: string
   token: () => Promise<string | undefined>
-  /** `path` is relative to `/api/v4`. Throws `GitlabApiError` on a non-ok response. */
-  request: (path: string) => Promise<Response>
+  /** `path` is relative to `/api/v4`; `body` is sent as JSON. Throws `GitlabApiError` on a non-ok response. */
+  request: (path: string, options?: { method?: string, body?: object }) => Promise<Response>
   /** Follows `per_page=100` pages until a short one comes back. */
   paginate: <T>(path: string) => Promise<T[]>
 }
@@ -27,16 +27,18 @@ export function projectPath(project: string): string {
 export function createGitlabClient(host: string, credentials?: Credentials): GitlabClient {
   const token = async () => credentials?.gitlabToken?.(host)
 
-  async function request(path: string): Promise<Response> {
+  async function request(path: string, options: { method?: string, body?: object } = {}): Promise<Response> {
     const auth = await token()
     const headers: Record<string, string> = { Accept: 'application/json' }
+    if (options.body !== undefined)
+      headers['Content-Type'] = 'application/json'
     // Bearer carries both a personal access token and an OAuth access token.
     if (auth)
       headers.Authorization = `Bearer ${auth}`
     const url = `https://${host}/api/v4${path}`
     let res: Response
     try {
-      res = await fetch(url, { headers })
+      res = await fetch(url, { method: options.method ?? 'GET', headers, body: options.body === undefined ? undefined : JSON.stringify(options.body) })
     }
     catch (err) {
       // A browser reports a CORS refusal as a bare network error, indistinguishable from the host being down.

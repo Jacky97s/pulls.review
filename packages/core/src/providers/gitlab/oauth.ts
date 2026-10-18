@@ -12,7 +12,8 @@ export interface GitlabOAuthToken {
   expiresAt: number
 }
 
-export const GITLAB_OAUTH_SCOPE = 'read_api'
+/** Comments and reviews write notes, which `read_api` cannot. */
+export const GITLAB_OAUTH_SCOPE = 'api'
 
 function base64url(bytes: Uint8Array): string {
   return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')

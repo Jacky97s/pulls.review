@@ -30,7 +30,8 @@ or any self-hosted instance, on the site, the CLI and (later) GitLab CI.
   build time, or from Settings. The pending sign-in (state, verifier, return path) lives
   in `sessionStorage` and is spent on the first callback; the return path is limited to
   this site. Tokens are kept per host like a PAT and renewed one minute before expiry,
-  once per host for concurrent requests; a refused refresh signs that host out. Every
+  once per host for concurrent requests; a refused refresh signs that host out.
+  The scope is `api`: comments write notes, which `read_api` cannot. Every
   token is sent as `Authorization: Bearer`, which GitLab accepts for PATs too.
 - **Target: company-internal open source.** The SPA is deployed on an internal host;
   self-hosted GitLab is the primary instance, gitlab.com stays supported.
@@ -44,7 +45,7 @@ or any self-hosted instance, on the site, the CLI and (later) GitLab CI.
 | S2b | Sign in with a GitLab Application (OAuth authorization code + PKCE, no client secret): per-host `clientId` from build-time config (one app registered by an admin for the internal deployment) or entered in Settings; refresh tokens kept per host | browser sign-in round trip on gitlab1; token refresh after expiry |
 | S3 | Project MR list at `/gl/{host}/{project}` | browser |
 | S4 | CLI accepts GitLab URLs; tokens from `GITLAB_TOKEN`/`GITLAB_HOST` | run the CLI |
-| S5 | (deferred) Review threads: discussions, draft notes, approve | own plan |
+| S5 | Review threads: diff discussions as threads, the viewer's draft notes as the pending review (negative ids), reply/edit/delete/resolve, submit via `draft_notes/bulk_publish` (`reviewer_state=requested_changes` for request changes) plus `/approve`; unchanged lines carry both `old_line` and `new_line`, ranges a `line_code`. Writes need the `api` scope, which OAuth now requests; `read_api` tokens stay read-only | co-located vitest; a real comment round trip on gitlab1 |
 | S6 | (deferred) Shared analysis as an MR note; GitLab CI job in place of `action.yml` | own plan |
 
 Out of scope: a GitLab embed (browser extension).
