@@ -1,7 +1,7 @@
 {
   "name": "@pulls.review/core",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Fetch, parse, group and summarize pull request diffs - the runtime-agnostic core of pulls.review.",
   "author": "Anthony Fu <hi@antfu.me>",
   "license": "MIT",
@@ -9,16 +9,17 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git",
+    "url": "git+https://github.com/Jacky97s/pulls.review.git",
     "directory": "packages/core"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "sideEffects": false,
   "exports": {
     "./types": "./dist/types.js",
     "./cache": "./dist/cache.js",
     "./patch-parser": "./dist/patch-parser.js",
     "./github": "./dist/github.js",
+    "./gitlab": "./dist/gitlab.js",
     "./paste": "./dist/paste.js",
     "./analyze": "./dist/analyze.js",
     "./llm": "./dist/llm.js",

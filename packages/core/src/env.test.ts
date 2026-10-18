@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { githubTokenFromEnv, llmSettingsFromEnv } from './env'
+import { githubTokenFromEnv, gitlabTokenFromEnv, llmSettingsFromEnv } from './env'
 
 describe('llmSettingsFromEnv', () => {
   it('picks the provider from the first conventional key present', () => {
@@ -40,5 +40,19 @@ describe('githubTokenFromEnv', () => {
     expect(githubTokenFromEnv({ GITHUB_TOKEN: 'a', PULLS_REVIEW_GITHUB_TOKEN: 'b' })).toBe('b')
     expect(githubTokenFromEnv({ GITHUB_TOKEN: 'a', PULLS_REVIEW_GITHUB_TOKEN: '' })).toBe('a')
     expect(githubTokenFromEnv({})).toBeUndefined()
+  })
+})
+
+describe('gitlabTokenFromEnv', () => {
+  it('gives the token to gitlab.com unless GITLAB_HOST names another instance', () => {
+    expect(gitlabTokenFromEnv({ GITLAB_TOKEN: 't' }, 'gitlab.com')).toBe('t')
+    expect(gitlabTokenFromEnv({ GITLAB_TOKEN: 't' }, 'gitlab1.program.com.tw')).toBeUndefined()
+  })
+
+  it('gives the token only to the host GITLAB_HOST names, given as a URL or a host', () => {
+    const env = { GITLAB_TOKEN: 't', GITLAB_HOST: 'https://gitlab1.program.com.tw/' }
+    expect(gitlabTokenFromEnv(env, 'gitlab1.program.com.tw')).toBe('t')
+    expect(gitlabTokenFromEnv(env, 'gitlab.com')).toBeUndefined()
+    expect(gitlabTokenFromEnv({ PULLS_REVIEW_GITLAB_TOKEN: 'p', GITLAB_TOKEN: 't' }, 'gitlab.com')).toBe('p')
   })
 })

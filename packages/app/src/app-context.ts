@@ -5,6 +5,7 @@ import type { LlmRunner } from './analyze/llm-runner'
 import { inject } from 'vue'
 import { browserLlmRunner } from './analyze/browser-llm-runner'
 import { createBrowserCache } from './cache/browser-cache'
+import { gitlabAccessToken } from './state/gitlab-auth'
 import { settings } from './state/settings'
 
 /**
@@ -24,6 +25,7 @@ export const appContextKey: InjectionKey<AppContext> = Symbol('app-context')
 /** Read on every request, so a token saved in Settings applies without rebuilding a store. */
 export const settingsCredentials: Credentials = {
   githubToken: async () => settings.value.githubToken || undefined,
+  gitlabToken: gitlabAccessToken,
 }
 
 export function installAppContext(app: App, context: AppContext = { cache: createBrowserCache(), credentials: settingsCredentials, llm: browserLlmRunner }): void {

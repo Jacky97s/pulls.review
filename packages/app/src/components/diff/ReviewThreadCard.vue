@@ -11,6 +11,15 @@ const props = defineProps<{
   reviews: DiffsStoreReviews
 }>()
 
+defineEmits<{
+  /** Pointer over a thread on a line range: the diff highlights its lines while it stays. */
+  highlight: [range: { start: number, end: number } | undefined]
+}>()
+
+const range = computed(() => props.thread.startLine !== undefined && props.thread.line !== undefined && props.thread.startLine < props.thread.line
+  ? { start: props.thread.startLine, end: props.thread.line }
+  : undefined)
+
 const busy = ref(false)
 const error = ref<string>()
 const replying = ref(false)
@@ -48,7 +57,15 @@ async function sendReply() {
 </script>
 
 <template>
-  <div class="my-1 max-w-200 overflow-hidden border border-base rounded-lg bg-base text-left font-sans">
+  <div
+    class="my-1 max-w-200 overflow-hidden border border-base rounded-lg bg-base text-left font-sans"
+    @pointerenter="range && $emit('highlight', range)"
+    @pointerleave="range && $emit('highlight', undefined)"
+  >
+    <header v-if="range" class="flex items-center gap-1 border-b border-base bg-raised px-3 py-1 text-xs op-fade">
+      <span class="i-ph:brackets-curly-duotone" aria-hidden="true" />
+      {{ $t('review.lines', range) }}
+    </header>
     <div class="divide-y divide-#9992">
       <ReviewCommentCard
         v-for="comment in thread.comments"

@@ -1,7 +1,9 @@
 import type { Env } from '@pulls.review/core/env'
 import type { PullRequestRef } from '@pulls.review/core/github'
+import type { GitlabMergeRequestRef } from '@pulls.review/core/gitlab'
 import type { Locale } from '@pulls.review/core/locales'
 import { githubTokenFromEnv } from '@pulls.review/core/env'
+import { parseGitlabUrl } from '@pulls.review/core/gitlab'
 import { DEFAULT_LOCALE, isLocale } from '@pulls.review/core/locales'
 
 export interface Flags {
@@ -51,4 +53,25 @@ export function resolveTarget(arg: string | undefined, env: Env, event?: GithubE
   if (!owner || !repo || number === undefined)
     throw new Error('No pull request given. Pass owner/repo#123, or run on a pull_request event in GitHub Actions.')
   return { owner, repo, number: String(number) }
+}
+
+/**
+ * A GitLab merge request to analyze: a merge request URL from any instance, or
+ * `group/project!123` on gitlab.com; with no argument, the merge request pipeline's own
+ * (`CI_MERGE_REQUEST_IID`). `undefined` when neither names one - a GitHub target, then.
+ */
+export function resolveGitlabTarget(arg: string | undefined, env: Env): GitlabMergeRequestRef | undefined {
+  if (arg) {
+    const location = parseGitlabUrl(arg)
+    return location?.kind === 'gitlab-mr' ? { host: location.host, project: location.project, iid: location.iid } : undefined
+  }
+  const { CI_SERVER_HOST: host, CI_PROJECT_PATH: project, CI_MERGE_REQUEST_IID: iid } = env
+  return host && project && iid ? { host, project, iid } : undefined
+}
+
+export function resolveGitlabToken(env: Env): string {
+  const token = first(env.PULLS_REVIEW_GITLAB_TOKEN, env.GITLAB_TOKEN)
+  if (!token)
+    throw new Error('A GitLab token with the api scope is required: set GITLAB_TOKEN (or PULLS_REVIEW_GITLAB_TOKEN). A CI job token cannot post notes.')
+  return token
 }

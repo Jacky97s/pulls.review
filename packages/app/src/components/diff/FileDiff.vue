@@ -19,7 +19,7 @@ import CriticalMark from './CriticalMark.vue'
 import { diffVirtualizerKey } from './diff-virtualizer'
 import DiffStats from './DiffStats.vue'
 import { fileCollapseKey } from './file-collapse'
-import { buildFileDiff, needsFullFileToHighlight } from './file-diff-input'
+import { buildFileDiff, changeCounts, needsFullFileToHighlight } from './file-diff-input'
 import FileStatus from './FileStatus.vue'
 import { fileIsCritical } from './group-utils'
 import { isNoisyFile } from './noisy-files'
@@ -49,6 +49,7 @@ const isDark = inject(isDarkKey, globalIsDark)
 const virtualizer = inject(diffVirtualizerKey, undefined)
 
 const containerRef = useTemplateRef<HTMLDivElement>('container')
+const truncatedRef = useTemplateRef<HTMLDivElement>('truncated')
 // Standalone (stories) there's no `DiffsPage` providing it, so state stays local.
 const collapseState = inject(fileCollapseKey, () => reactive(new Map<string, boolean>()), true)
 const collapsed = computed({
@@ -134,6 +135,15 @@ watch([nearViewport, autoFetchFullFile], ([near, enabled]) => {
   if (canLoadFullFile.value && needsFullFileToHighlight(props.file))
     loadFullFile()
 })
+
+// A truncated file has no diff to show until its content loads, so it loads once it
+// nears the viewport - one file at a time as the reader scrolls, never all up front.
+const { stop: stopTruncatedLoad } = useIntersectionObserver(truncatedRef, ([entry]) => {
+  if (!entry?.isIntersecting || !canLoadFullFile.value)
+    return
+  stopTruncatedLoad()
+  loadFullFile()
+}, { rootMargin: '600px 0px' })
 
 // Container width, tracked for `effectiveLayout` below - a `ResizeObserver` rather than
 // a viewport-width media query since this is per-file-diff container width (the sidebar/
@@ -228,6 +238,17 @@ function openDraft(range: SelectedLineRange) {
   draftError.value = undefined
 }
 
+/** Highlights a range thread's lines while the pointer is on it; the open draft's own selection comes back after. */
+function highlightThread(thread: CommentThread, range: { start: number, end: number } | undefined) {
+  const draft = draftTarget.value
+  if (range)
+    instance?.setSelectedLines({ start: range.start, end: range.end, side: thread.startSide ?? thread.side, endSide: thread.side })
+  else if (draft?.startLine !== undefined)
+    instance?.setSelectedLines({ start: draft.startLine, end: draft.line, side: draft.startSide ?? draft.side, endSide: draft.side })
+  else
+    instance?.setSelectedLines(null)
+}
+
 async function submitDraft(body: string, mode: 'single' | 'review') {
   const target = draftTarget.value
   const r = reviews.value
@@ -252,7 +273,13 @@ const MIN_SPLIT_WIDTH_PX = 640
 // Forces `unified` regardless of the user's global layout preference when a split view
 // wouldn't fit (container too narrow for two columns) or wouldn't show anything useful
 // (a file that's purely additions or purely deletions has nothing on the other side).
-const isOneSided = computed(() => props.file.additions === 0 || props.file.deletions === 0)
+// A truncated file's counts are unknown (both 0) until its content loads; then the built diff has them.
+const isOneSided = computed(() => {
+  const counts = props.file.truncated
+    ? fileDiff.value && fullFileLoaded.value ? changeCounts(fileDiff.value) : undefined
+    : props.file
+  return !!counts && (counts.additions === 0 || counts.deletions === 0)
+})
 const effectiveLayout = computed<'split' | 'unified'>(() => {
   if (props.store.ui.layout === 'unified' || isOneSided.value)
     return 'unified'
@@ -331,7 +358,11 @@ watch(
     if (!fileDiff || !containerRef) {
       return
     }
-    instance?.render({
+    // The container only appears once a truncated file's content loads: nothing mounted
+    // into it yet, so this is the first render rather than an update.
+    if (!instance)
+      return mount()
+    instance.render({
       fileDiff,
       fileContainer: containerRef,
       lineAnnotations: lineAnnotations.value.map(annotation => ({ ...annotation })),
@@ -420,8 +451,11 @@ defineExpose({
     <div v-if="file.isBinary" class="p-4 text-sm op-fade">
       {{ $t('file.binaryNotShown') }}
     </div>
-    <div v-else-if="file.truncated && !fullFileLoaded" class="p-4 text-sm op-fade">
-      {{ $t('file.tooLarge') }}
+    <div v-else-if="file.truncated && !fullFileLoaded" ref="truncated" class="flex flex-wrap items-center gap-2 p-4 text-sm">
+      <span class="op-fade">{{ fullFileError?.message ?? $t('file.tooLarge') }}</span>
+      <ActionButton v-if="canLoadFullFile" size="sm" :loading="isLoadingFullFile" @click="loadFullFile">
+        {{ $t('file.loadFull') }}
+      </ActionButton>
     </div>
     <div v-else ref="container" :class="status === 'changed' ? 'mb--2' : 'my--2'">
       <!--
@@ -445,10 +479,12 @@ defineExpose({
           :key="thread.rootId"
           :thread="thread"
           :reviews="store.reviews!"
+          @highlight="highlightThread(thread, $event)"
         />
         <div v-if="group.hasDraft" class="my-1 max-w-200 overflow-hidden border border-base rounded-lg bg-base">
           <CommentComposer
             :has-pending-review="!!store.reviews!.pendingReview"
+            :range="draftTarget?.startLine !== undefined ? { start: draftTarget.startLine, end: draftTarget.line } : undefined"
             :busy="draftBusy"
             :error="draftError"
             @submit="submitDraft"

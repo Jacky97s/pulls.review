@@ -1,16 +1,70 @@
 name: Release
 
+# Every push to main whose version has no tag yet becomes a GitHub Release: bump the
+# version and add its CHANGELOG.md section in the PR, and merging it releases. A push
+# that leaves the version alone does nothing.
+#
+# A GitHub Release instead of npm: the npm names belong to upstream, whose packages
+# lack this fork's GitLab support. Install with
+#   npm i -g https://github.com/Jacky97s/pulls.review/releases/latest/download/pulls.review.tgz
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  release:
-    uses: sxzz/workflows/.github/workflows/release.yml@main
-    with:
-      publish: true
-      build: pnpm --filter '!@pulls.review/app' -r run build
+  cli:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Version
+        id: version
+        run: |
+          tag="v$(node -p "require('./packages/cli/package.json').version")"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "$tag is already released."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: pnpm/action-setup@v6
+        if: steps.version.outputs.exists != 'true'
+      - uses: actions/setup-node@v7
+        if: steps.version.outputs.exists != 'true'
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      # The root `prepare` sets up coding-agent skills and fails where no agent is installed.
+      - name: Install
+        if: steps.version.outputs.exists != 'true'
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build
+        if: steps.version.outputs.exists != 'true'
+        run: pnpm -F @pulls.review/core run build && pnpm -F pulls.review run build
+
+      # A fixed asset name, so `releases/latest/download/pulls.review.tgz` always resolves.
+      - name: Pack
+        if: steps.version.outputs.exists != 'true'
+        run: |
+          pnpm -F pulls.review pack --pack-destination "$RUNNER_TEMP"
+          mv "$RUNNER_TEMP"/pulls.review-*.tgz pulls.review.tgz
+
+      # The notes are this version's CHANGELOG.md section, up to the next `## [`.
+      - name: Release
+        if: steps.version.outputs.exists != 'true'
+        run: |
+          version="${TAG#v}"
+          awk -v v="$version" '/^## \[/ { found = index($0, "[" v "]") > 0; next } found' CHANGELOG.md > notes.md
+          [ -s notes.md ] || { echo "CHANGELOG.md has no section for $version"; exit 1; }
+          gh release create "$TAG" pulls.review.tgz --target "$GITHUB_SHA" --title "$TAG" --notes-file notes.md
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}

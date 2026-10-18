@@ -27,7 +27,7 @@ export function renderFilesAsText(files: FileChange[]): string {
 export const INLINE_DIFF_CHAR_LIMIT = 200_000
 
 const ROLE_SECTION = `<role>
-You organize a GitHub pull request's changed files into review groups, so a reviewer can read the PR feature by feature instead of file by file.
+You organize a code change's files - a pull or merge request, a commit range, or a patch - into review groups, so a reviewer can read the change feature by feature instead of file by file.
 </role>
 
 <grouping_principles>
@@ -51,7 +51,7 @@ export const AGENT_SYSTEM_PROMPT = `${ROLE_SECTION}
 
 <workflow>
 1. Read the manifest and form a grouping hypothesis from paths and hunk headers.
-2. Call read_diffs only where the hypothesis is uncertain, or where a change looks risky enough to deserve a note. Batch paths into one call. Never read [generated] or [binary] paths.
+2. Call read_diffs only where the hypothesis is uncertain, or where a change looks risky enough to deserve a note. Batch paths into one call. [generated] and [binary] paths have no diff to read; skip them.
 3. Call submit_grouping once. If it returns an error, fix exactly what it names and call it again.
 </workflow>
 
@@ -76,7 +76,7 @@ export function buildCliAgentSystemPrompt({ patchPath, repository }: CliAgentPro
 
 <workflow>
 1. Read the manifest and form a grouping hypothesis from paths and hunk headers.
-2. The full patch is at ${patchPath}; read it (or parts of it) only where the hypothesis is uncertain, or where a change looks risky enough to deserve a note. ${files} Never read [generated] or [binary] paths.
+2. The full patch is at ${patchPath}; read it (or parts of it) only where the hypothesis is uncertain, or where a change looks risky enough to deserve a note. ${files} [generated] and [binary] paths have no diff to read; skip them.
 3. Finish by answering with the grouping as JSON matching the schema, and nothing else.
 </workflow>
 
@@ -84,7 +84,7 @@ ${OUTPUT_SECTION}`
 }
 
 export const CHAT_SYSTEM_SECTION = `<chat>
-The grouping has been submitted and the reviewer is now asking follow-up questions about this pull request.
+The grouping has been submitted and the reviewer is now asking follow-up questions about this change.
 - Always reply in the same natural language as the user's latest message, whatever language the diffs, summaries and earlier messages are in. Keep code, paths and identifiers as they are.
 - Answer from the diffs. Call read_diffs when you need a file you have not seen or whose diff was omitted.
 - Call update_grouping only when the user asks to change the grouping. Send the complete new grouping; every manifest path must appear exactly once.
@@ -93,7 +93,7 @@ The grouping has been submitted and the reviewer is now asking follow-up questio
 
 /** The chat rules for a local agent CLI: the grouping update is a fenced JSON block, not a tool call. */
 export const CLI_AGENT_CHAT_SECTION = `<chat>
-The grouping has been submitted and the reviewer is now asking follow-up questions about this pull request.
+The grouping has been submitted and the reviewer is now asking follow-up questions about this change.
 - Always reply in the same natural language as the user's latest message, whatever language the diffs, summaries and earlier messages are in. Keep code, paths and identifiers as they are.
 - Answer from the patch; read it again when you need a file you have not seen.
 - Only when the user asks to change the grouping, end your reply with one fenced \`\`\`json block holding the complete new grouping in the same schema as before; every manifest path must appear exactly once. Otherwise, include no JSON.
@@ -152,9 +152,9 @@ export function buildManifest(files: FileChange[]): string {
 
 /** The first user message. Stays English whatever `locale` is; only the closing instruction names the output language. */
 export function buildAnalysisPrompt(diff: DiffsPayload, locale: Locale): string {
-  const parts = [`PR title: ${diff.title}`]
+  const parts = [`Title: ${diff.title}`]
   if (diff.url)
-    parts.push(`PR link: ${diff.url}`)
+    parts.push(`Link: ${diff.url}`)
   if (diff.description)
     parts.push(`---DESCRIPTION---\n${diff.description}`)
   // A single commit adds nothing the title and description don't already say.

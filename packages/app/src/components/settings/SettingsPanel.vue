@@ -10,6 +10,7 @@ import { useI18n } from 'vue-i18n'
 import AutoFetchFullFileSettingsSection from './AutoFetchFullFileSettingsSection.vue'
 import AutoRefreshSettingsSection from './AutoRefreshSettingsSection.vue'
 import GithubTokenSettings from './GithubTokenSettings.vue'
+import GitlabTokenSettings from './GitlabTokenSettings.vue'
 import LayoutSettingsSection from './LayoutSettingsSection.vue'
 import LlmSettingsSection from './LlmSettingsSection.vue'
 import NavigationSettingsSection from './NavigationSettingsSection.vue'
@@ -44,6 +45,7 @@ const tabs = computed(() => [
   { value: 'appearance', label: t('settings.tabs.appearance'), icon: 'i-ph:paint-brush-duotone' },
   { value: 'behavior', label: t('settings.tabs.behavior'), icon: 'i-ph:sliders-duotone' },
   { value: 'github', label: t('settings.tabs.github'), icon: 'i-ph:github-logo-duotone', attention: !props.githubTokenSet },
+  { value: 'gitlab', label: t('settings.tabs.gitlab'), icon: 'i-ph:gitlab-logo-duotone' },
   { value: 'ai', label: t('settings.tabs.ai'), icon: 'i-ph:sparkle-duotone', attention: !llmSetup.value },
 ] satisfies { value: SettingsTab, label: string, icon: string, attention?: boolean }[])
 </script>
@@ -90,6 +92,10 @@ const tabs = computed(() => [
         :error="githubTokenError"
         @save="$emit('saveGithubToken', $event)"
       />
+    </TabsContent>
+
+    <TabsContent value="gitlab" class="flex flex-col gap-4 p4 outline-none data-[state=inactive]:hidden">
+      <GitlabTokenSettings />
     </TabsContent>
 
     <TabsContent value="ai" class="flex flex-col gap-4 p4 outline-none data-[state=inactive]:hidden">

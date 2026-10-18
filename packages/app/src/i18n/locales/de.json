@@ -312,6 +312,8 @@
     "requestChanges": "Änderungen anfordern",
     "discard": "Review verwerfen",
     "leaveComment": "Kommentar hinterlassen",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Einzelnen Kommentar hinzufügen",
     "addToReview": "Review-Kommentar hinzufügen",
     "startReview": "Review beginnen",
@@ -370,7 +372,8 @@
       "behavior": "Verhalten",
       "github": "GitHub",
       "ai": "KI-Analyse",
-      "notSetUp": "Noch nicht eingerichtet"
+      "notSetUp": "Noch nicht eingerichtet",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "KI-Analyse",
@@ -388,6 +391,17 @@
       "changeKey": "Key ändern",
       "model": "Modell",
       "modelListFailed": "Die Modellliste konnte nicht geladen werden ({error}). Gib eine Modell-ID manuell ein.",
+      "reasoning": "Reasoning",
+      "reasoningHint": "How hard the model thinks before answering. On api.openai.com requests use the Responses API; other endpoints use chat completions, where newer OpenAI models can't call tools while reasoning, so they default to off there.",
+      "reasoningLevels": {
+        "default": "Model default",
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high"
+      },
       "embedUnavailable": "KI-Funktionen sind im eingebetteten Modus nicht verfügbar",
       "embedReason": "Die strikte CSP von github.com blockiert die Anfragen, die KI-Funktionen hier benötigen. {link}, um sie zu nutzen.",
       "goToWebsite": "Zur Website",
@@ -407,6 +421,24 @@
       "free": "Kostenlos",
       "priceTitle": "Eingabe {input}/M · Ausgabe {output}/M Tokens",
       "agentDefault": "Standard des Agenten"
+    },
+    "gitlab": {
+      "label": "GitLab Personal Access Token",
+      "labelFor": "GitLab token for {host}",
+      "hint": "Needs the read_api scope to read, or api to comment and review. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "generate": "Generate one on this instance →",
+      "tokenSaved": "Token saved",
+      "signIn": "Sign in",
+      "signInTo": "Sign in with {host}",
+      "signedIn": "Signed in",
+      "signingIn": "Signing in to GitLab…",
+      "signInFailed": "GitLab sign-in failed",
+      "backHome": "Back to home",
+      "application": "GitLab Application (optional)",
+      "applicationId": "Application ID",
+      "applicationSaved": "Application saved",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope api, redirect URI {redirectUri}.",
+      "registerApplication": "Register an application on this instance →"
     }
   },
   "rules": {

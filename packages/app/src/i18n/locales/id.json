@@ -312,6 +312,8 @@
     "requestChanges": "Minta perubahan",
     "discard": "Buang tinjauan",
     "leaveComment": "Tulis komentar",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Tambah satu komentar",
     "addToReview": "Tambah komentar tinjauan",
     "startReview": "Mulai tinjauan",
@@ -370,7 +372,8 @@
       "behavior": "Perilaku",
       "github": "GitHub",
       "ai": "Analisis AI",
-      "notSetUp": "Belum diatur"
+      "notSetUp": "Belum diatur",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "Analisis AI",
@@ -388,6 +391,17 @@
       "changeKey": "Ganti kunci",
       "model": "Model",
       "modelListFailed": "Daftar model tidak dapat dimuat ({error}). Masukkan id model secara manual.",
+      "reasoning": "Reasoning",
+      "reasoningHint": "How hard the model thinks before answering. On api.openai.com requests use the Responses API; other endpoints use chat completions, where newer OpenAI models can't call tools while reasoning, so they default to off there.",
+      "reasoningLevels": {
+        "default": "Model default",
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high"
+      },
       "embedUnavailable": "Fitur AI tidak tersedia dalam mode tersemat",
       "embedReason": "CSP github.com yang ketat memblokir permintaan yang dibutuhkan fitur AI di sini. {link} untuk menggunakannya.",
       "goToWebsite": "Kunjungi situs web",
@@ -407,6 +421,24 @@
       "free": "Gratis",
       "priceTitle": "Input {input}/M · Output {output}/M token",
       "agentDefault": "Bawaan agen"
+    },
+    "gitlab": {
+      "label": "GitLab Personal Access Token",
+      "labelFor": "GitLab token for {host}",
+      "hint": "Needs the read_api scope to read, or api to comment and review. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "generate": "Generate one on this instance →",
+      "tokenSaved": "Token saved",
+      "signIn": "Sign in",
+      "signInTo": "Sign in with {host}",
+      "signedIn": "Signed in",
+      "signingIn": "Signing in to GitLab…",
+      "signInFailed": "GitLab sign-in failed",
+      "backHome": "Back to home",
+      "application": "GitLab Application (optional)",
+      "applicationId": "Application ID",
+      "applicationSaved": "Application saved",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope api, redirect URI {redirectUri}.",
+      "registerApplication": "Register an application on this instance →"
     }
   },
   "rules": {

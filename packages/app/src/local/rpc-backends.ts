@@ -21,13 +21,22 @@ export function createRpcDriver(rpc: LocalRpc): Driver {
   }
 }
 
-/** The GitHub token the server found (environment or `gh`), read once per page load. */
+/** The tokens the server found (environment, `gh` or `glab`), read once per page load and host; Settings fill in the rest. */
 export function createRpcCredentials(rpc: LocalRpc, fallback: Credentials): Credentials {
   let token: Promise<string | undefined> | undefined
+  const gitlabTokens = new Map<string, Promise<string | undefined>>()
   return {
     async githubToken() {
       token ??= rpc.call(LOCAL_RPC.githubToken).then(value => v.parse(v.optional(v.string()), value ?? undefined))
       return await token ?? fallback.githubToken()
+    },
+    async gitlabToken(host) {
+      let pending = gitlabTokens.get(host)
+      if (!pending) {
+        pending = rpc.call(LOCAL_RPC.gitlabToken, { host }).then(value => v.parse(v.optional(v.string()), value ?? undefined))
+        gitlabTokens.set(host, pending)
+      }
+      return await pending ?? fallback.gitlabToken?.(host)
     },
   }
 }

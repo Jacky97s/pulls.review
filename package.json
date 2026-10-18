@@ -1,7 +1,7 @@
 {
   "name": "@pulls.review/monorepo",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "private": true,
   "packageManager": "pnpm@12.9.1",
   "description": "Review pull requests with grouped, summarized, and beautiful diffs.",
@@ -11,9 +11,9 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git"
+    "url": "git+https://github.com/Jacky97s/pulls.review.git"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "scripts": {
     "build": "pnpm -r run build",
     "dev": "pnpm -F @pulls.review/app run dev",

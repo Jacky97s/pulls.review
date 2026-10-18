@@ -10,11 +10,12 @@ import mermaid from '@comark/vue/plugins/mermaid'
 import { Virtualizer } from '@pierre/diffs'
 import { useElementBounding, useElementSize, useEventListener } from '@vueuse/core'
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useId, useTemplateRef, watch } from 'vue'
+import { scrollToAnchor } from '../../composables/scrollToFile'
 import { useDragResize } from '../../composables/useDragResize'
+import { markdownImageLoaderKey, useMarkdownImages } from '../../composables/useMarkdownImages'
 import { autoRefresh } from '../../state/auto-refresh'
 import { CHAT_PANEL_DOCK_MIN_WIDTH } from '../../state/chat-panel'
 import { GROUP_SIDEBAR_MAX_RATIO, GROUP_SIDEBAR_MIN_WIDTH, groupSidebarWidth, isWide, showGroupSidebar } from '../../state/group-nav'
-import { scrollBehavior } from '../../state/smooth-scroll'
 import GithubTokenRecovery from '../settings/GithubTokenRecovery.vue'
 import { diffVirtualizerKey } from './diff-virtualizer'
 import DiffGroup from './DiffGroup.vue'
@@ -58,6 +59,10 @@ const groups = computed(() => props.store?.groups ?? [])
 const virtualizer = new Virtualizer()
 provide(diffVirtualizerKey, virtualizer)
 provide(fileCollapseKey, reactive(new Map<string, boolean>()))
+provide(markdownImageLoaderKey, props.store?.loadImage)
+
+// Passed, not injected: a component can't inject what it provides itself.
+const description = useMarkdownImages(() => props.store?.diff?.description ?? '', props.store?.loadImage)
 const rootEl = useTemplateRef<HTMLElement>('root')
 onMounted(() => {
   virtualizer.setup(props.document && !(props.document instanceof Document) ? rootEl.value! : document)
@@ -154,12 +159,16 @@ watch([groups, headerOffset], () => nextTick(() => {
 }), { immediate: true })
 
 function scrollToGroup(key: string) {
-  (props.document ?? document).getElementById(`group-${key}`)?.scrollIntoView({ behavior: scrollBehavior.value, block: 'start' })
+  const section = (props.document ?? document).getElementById(`group-${key}`)
+  if (section)
+    scrollToAnchor(section)
 }
 
 function selectDescription() {
   descriptionOpen.value = true
-  ;(props.document ?? document).getElementById(descriptionId)?.scrollIntoView({ behavior: scrollBehavior.value, block: 'start' })
+  const description = (props.document ?? document).getElementById(descriptionId)
+  if (description)
+    scrollToAnchor(description)
 }
 
 // Once dragged, the sidebar takes that width over its default `w-64` - capped, so the
@@ -293,7 +302,7 @@ function refreshFromBanner() {
               >
                 <div ref="descriptionBody">
                   <Suspense>
-                    <Markdown :value="diff.description" v-bind="descriptionMarkdown" class="description-markdown min-w-0" />
+                    <Markdown :value="description" v-bind="descriptionMarkdown" class="description-markdown min-w-0" />
                   </Suspense>
                 </div>
               </div>

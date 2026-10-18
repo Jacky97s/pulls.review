@@ -171,9 +171,11 @@ export interface DiffsStore {
   /** The source is live (its head can move), so refetching it can bring new changes. */
   readonly canRefresh: boolean
   /** The credential a failed load can be retried with; `undefined` when none would help (a paste). */
-  readonly auth?: 'github-token'
+  readonly auth?: 'github-token' | 'gitlab-token'
   /** `undefined` = this source can't fetch a file's full content (a paste has no live origin). */
   readonly fileContent?: DiffsStoreFileContent
+  /** Images in the diff's Markdown only the source can serve (a private GitLab's uploads); see `DiffSource.loadImage`. */
+  readonly loadImage?: (src: string) => Promise<Blob | undefined>
   load: () => Promise<void>
   refresh: () => Promise<void>
   /** Marks (or unmarks) files by `sha`; either way clears their `changedSinceReviewed` flag. */

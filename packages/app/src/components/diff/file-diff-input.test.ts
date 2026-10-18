@@ -2,7 +2,7 @@ import type { FileDiffMetadata } from '@pierre/diffs'
 import type { FileChange } from '@pulls.review/core/types'
 import { getSharedHighlighter, renderDiffWithHighlighter } from '@pierre/diffs'
 import { describe, expect, it } from 'vitest'
-import { buildFileDiff, needsFullFileToHighlight } from './file-diff-input'
+import { buildFileDiff, changeCounts, needsFullFileToHighlight } from './file-diff-input'
 
 // The only hunk starts on the backtick that *closes* a template literal opened
 // above it, in lines the patch doesn't carry.
@@ -80,5 +80,26 @@ describe('needsFullFileToHighlight', () => {
   it('is false for binary and truncated files', () => {
     expect(needsFullFileToHighlight(fileChange({ isBinary: true }))).toBe(false)
     expect(needsFullFileToHighlight(fileChange({ truncated: true, hunks: [] }))).toBe(false)
+  })
+})
+
+describe('buildFileDiff for a truncated file', () => {
+  const truncated: FileChange = { path: 'a.ts', status: 'modified', additions: 0, deletions: 0, isBinary: false, sha: 's', hunks: [], truncated: true }
+
+  it('diffs the two loaded versions itself, since the patch carries no hunks', () => {
+    const diff = buildFileDiff(truncated, { old: 'one\ntwo\n', new: 'one\n2\n' })!
+    expect(diff.hunks.length).toBeGreaterThan(0)
+  })
+
+  it('shows a whole added file once its content loads', () => {
+    const diff = buildFileDiff({ ...truncated, status: 'added' }, { new: 'a\nb\n' })!
+    expect(diff.hunks.length).toBeGreaterThan(0)
+  })
+})
+
+describe('changeCounts', () => {
+  it('counts the changed lines of a diff built from loaded content', () => {
+    const truncated: FileChange = { path: 'a.ts', status: 'modified', additions: 0, deletions: 0, isBinary: false, sha: 's', hunks: [], truncated: true }
+    expect(changeCounts(buildFileDiff(truncated, { old: 'one\ntwo\nthree\n', new: 'one\n2\nthree\nfour\n' })!)).toEqual({ additions: 2, deletions: 1 })
   })
 })

@@ -59,8 +59,7 @@ export const mockPullRequests: PullRequestListItem[] = [
 
 export function createMockPullRequestListStore(overrides: Partial<PullRequestListStore> = {}): PullRequestListStore {
   return reactive({
-    owner: 'antfu',
-    repo: 'pulls.review',
+    repository: { owner: 'antfu', repo: 'pulls.review' },
     items: mockPullRequests,
     totalCount: mockPullRequests.length,
     isLoading: false,
@@ -69,8 +68,8 @@ export function createMockPullRequestListStore(overrides: Partial<PullRequestLis
     hasMore: false,
     error: undefined,
     viewed: new Map([
-      [42, { additions: 812, deletions: 44, files: 19, groups: 5, hasAiResult: true }],
-      [40, { additions: 30, deletions: 2, files: 1, groups: 1, hasAiResult: false }],
+      ['/gh/antfu/pulls.review/42', { additions: 812, deletions: 44, files: 19, groups: 5, hasAiResult: true }],
+      ['/gh/antfu/pulls.review/40', { additions: 30, deletions: 2, files: 1, groups: 1, hasAiResult: false }],
     ]),
     load: async () => {},
     refresh: async () => {},

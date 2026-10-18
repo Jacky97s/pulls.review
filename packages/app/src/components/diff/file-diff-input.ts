@@ -1,6 +1,6 @@
 import type { FileDiffMetadata } from '@pierre/diffs'
 import type { FileChange } from '@pulls.review/core/types'
-import { processFile } from '@pierre/diffs'
+import { parseDiffFromFile, processFile } from '@pierre/diffs'
 
 export interface FullFileContents {
   old?: string
@@ -31,6 +31,13 @@ export function buildFileDiff(
   contents?: FullFileContents,
 ): FileDiffMetadata | undefined {
   const oldPath = file.previousPath ?? file.path
+  // A truncated patch carries no hunks to lay the content over: diff the two versions instead.
+  if (file.truncated && contents) {
+    return parseDiffFromFile(
+      contents.old !== undefined ? { name: oldPath, contents: contents.old } : null,
+      contents.new !== undefined ? { name: file.path, contents: contents.new } : null,
+    )
+  }
   return processFile(
     buildUnifiedDiffText(file),
     contents
@@ -54,4 +61,12 @@ export function needsFullFileToHighlight(file: FileChange): boolean {
   if (file.isBinary || file.truncated || file.status === 'added' || file.status === 'removed')
     return false
   return file.hunks.some(hunk => hunk.oldStart > 1 || hunk.newStart > 1)
+}
+
+/** Added and removed lines of a built diff - the counts a truncated file's patch couldn't carry. */
+export function changeCounts(diff: FileDiffMetadata): { additions: number, deletions: number } {
+  return diff.hunks.reduce(
+    (sum, hunk) => ({ additions: sum.additions + hunk.additionLines, deletions: sum.deletions + hunk.deletionLines }),
+    { additions: 0, deletions: 0 },
+  )
 }

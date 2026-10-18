@@ -25,7 +25,10 @@ export function formatDate(date: Date): string {
   return `${year}${month}${day}${hours}${minutes}${seconds}`
 }
 
+/** `GIT_SHA` when the build runs without a checkout (a Docker build), else the checkout's HEAD. */
 export function getSha(): string {
+  if (process.env.GIT_SHA)
+    return process.env.GIT_SHA
   return execSync('git rev-parse --short HEAD', { cwd: fileURLToPath(new URL('..', import.meta.url)) }).toString().trim()
 }
 
@@ -49,7 +52,7 @@ export async function buildUserscript() {
 // @run-at       document-idle
 // @updateURL    https://pulls.review/pulls-review-github.user.js
 // @downloadURL  https://pulls.review/pulls-review-github.user.js
-// @supportURL   https://github.com/antfu/pulls.review/issues
+// @supportURL   https://github.com/Jacky97s/pulls.review/issues
 // @homepageURL  https://pulls.review
 // ==/UserScript==
 

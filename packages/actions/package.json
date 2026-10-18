@@ -1,7 +1,7 @@
 {
   "name": "@pulls.review/actions",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Analyze a GitHub pull request with pulls.review and post the grouped summary as a PR comment.",
   "author": "Anthony Fu <hi@antfu.me>",
   "license": "MIT",
@@ -9,10 +9,10 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git",
+    "url": "git+https://github.com/Jacky97s/pulls.review.git",
     "directory": "packages/actions"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "keywords": [
     "pull-request",
     "code-review",

@@ -1,7 +1,7 @@
 {
   "name": "pulls.review",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Review local git changes - the working tree, a commit or any range - grouped and summarized in the browser.",
   "author": "Anthony Fu <hi@antfu.me>",
   "license": "MIT",
@@ -9,10 +9,10 @@
   "homepage": "https://pulls.review",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/pulls.review.git",
+    "url": "git+https://github.com/Jacky97s/pulls.review.git",
     "directory": "packages/cli"
   },
-  "bugs": "https://github.com/antfu/pulls.review/issues",
+  "bugs": "https://github.com/Jacky97s/pulls.review/issues",
   "keywords": [
     "pull-request",
     "code-review",
@@ -40,17 +40,22 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pulls.review/core": "workspace:^",
+    "@ai-sdk/gateway": "catalog:frontend",
+    "@earendil-works/pi-agent-core": "catalog:frontend",
+    "@earendil-works/pi-ai": "catalog:frontend",
+    "@valibot/to-json-schema": "catalog:frontend",
     "devframe": "catalog:frontend",
+    "diff": "catalog:frontend",
     "h3": "catalog:frontend",
+    "lz-string-es": "catalog:frontend",
+    "nostics": "catalog:frontend",
+    "picomatch": "catalog:frontend",
     "unstorage": "catalog:frontend",
     "valibot": "catalog:frontend"
   },
   "devDependencies": {
-    "@earendil-works/pi-agent-core": "catalog:frontend",
-    "@earendil-works/pi-ai": "catalog:frontend",
+    "@pulls.review/core": "workspace:^",
     "@types/node": "catalog:dev",
-    "@valibot/to-json-schema": "catalog:frontend",
     "tsdown": "catalog:build",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"

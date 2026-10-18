@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import type { KeyedLlmProvider, LlmProvider, LlmSettings } from '@pulls.review/core/analyze'
+import type { KeyedLlmProvider, LlmProvider, LlmSettings, OpenaiReasoning } from '@pulls.review/core/analyze'
 import type { ModelOption } from '@pulls.review/core/llm'
 import ActionButton from '@antfu/design/components/Action/ActionButton.vue'
 import ActionIconButton from '@antfu/design/components/Action/ActionIconButton.vue'
 import ActionToggleGroup from '@antfu/design/components/Action/ActionToggleGroup.vue'
 import FormField from '@antfu/design/components/Form/FormField.vue'
+import FormSelect from '@antfu/design/components/Form/FormSelect.vue'
 import FormTextInput from '@antfu/design/components/Form/FormTextInput.vue'
+import { OPENAI_REASONING_LEVELS } from '@pulls.review/core/analyze'
 import { computed, defineAsyncComponent, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ModelPicker from './ModelPicker.vue'
 
 const props = defineProps<{
@@ -53,6 +56,13 @@ const isOpenAi = computed(() => props.llmSettings.provider === 'openai-compatibl
 // The "Local agent" provider's form exists only in the `pulls.review` CLI's build; the site
 // and the embed show the provider with a note instead, and never bundle the form.
 const LocalAgentSettings = import.meta.env.PR_LOCAL ? defineAsyncComponent(() => import('./LocalAgentSettings.vue')) : undefined
+
+const { t } = useI18n()
+const reasoningOptions = computed(() => OPENAI_REASONING_LEVELS.map(value => ({ value, label: t(`settings.llm.reasoningLevels.${value}`) })))
+const reasoning = computed({
+  get: () => props.llmSettings.openaiReasoning,
+  set: (value: string) => update({ openaiReasoning: value as OpenaiReasoning }),
+})
 
 function update(patch: Partial<LlmSettings>) {
   emit('update:llmSettings', { ...props.llmSettings, ...patch })
@@ -222,6 +232,10 @@ const model = computed({
           <template v-if="modelsError" #error>
             {{ $t('settings.llm.modelListFailed', { error: modelsError }) }}
           </template>
+        </FormField>
+
+        <FormField v-if="isOpenAi" :label="$t('settings.llm.reasoning')" :description="$t('settings.llm.reasoningHint')">
+          <FormSelect v-model="reasoning" :options="reasoningOptions" />
         </FormField>
       </template>
     </div>

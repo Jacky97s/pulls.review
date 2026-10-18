@@ -6,6 +6,8 @@ import { ref } from 'vue'
 const props = defineProps<{
   /** A pending review exists: the only action is adding to it. */
   hasPendingReview: boolean
+  /** The selected lines when the draft spans more than one. */
+  range?: { start: number, end: number }
   busy?: boolean
   error?: string
 }>()
@@ -26,6 +28,9 @@ function submit(mode: 'single' | 'review') {
 
 <template>
   <div class="flex flex-col gap-2 p-2">
+    <p v-if="range" class="text-xs op-fade">
+      {{ $t('review.commentOnLines', range) }}
+    </p>
     <FormTextarea
       v-model="body"
       :rows="3"

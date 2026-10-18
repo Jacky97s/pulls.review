@@ -9,7 +9,7 @@ import { browserPath, pageFor } from './page'
 
 const HELP = `Usage: pulls.review [target] [options]
 
-Reviews local git changes - or any GitHub pull request - in the browser, grouped
+Reviews local git changes - or any GitHub pull request or GitLab merge request - in the browser, grouped
 and summarized. Run it inside a git repository. The target only picks the page
 that opens; any other can be picked from the browser.
 
@@ -24,6 +24,11 @@ Target (git revision syntax):
 Target (GitHub):
   owner/repo#123, or a github.com pull request, compare, commit or repo URL.
   Uses the GitHub token from GITHUB_TOKEN, else from \`gh auth token\`.
+
+Target (GitLab, gitlab.com or self-hosted):
+  group/project!123 (gitlab.com), or a merge request, compare, commit or
+  project URL from any instance. Uses GITLAB_TOKEN for the host in GITLAB_HOST
+  (default gitlab.com), else glab's token for that host.
 
 AI analysis uses a key from Settings, or a coding agent installed here (Claude
 Code, OpenCode, Pi) when "Local agent" is the provider in Settings.

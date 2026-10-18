@@ -25,10 +25,10 @@ export function sortPullRequests(items: PullRequestListItem[], sort: PullRequest
 }
 
 function searchText(item: PullRequestListItem): string {
-  return [item.title, `#${item.number}`, item.author?.login, ...item.labels.map(label => label.name)].filter(Boolean).join(' ')
+  return [item.title, `#${item.number}`, `!${item.number}`, item.repository, item.author?.login, ...item.labels.map(label => label.name)].filter(Boolean).join(' ')
 }
 
-/** fzf-style fuzzy match over title, `#number`, author login and label names; an empty query keeps everything. */
+/** fzf-style fuzzy match over title, `#number`/`!number`, a group item's project, author login and label names; an empty query keeps everything. */
 export function filterPullRequests(items: PullRequestListItem[], query: string): PullRequestListItem[] {
   const trimmed = query.trim()
   if (!trimmed)

@@ -1,0 +1,12 @@
+/** The GitLab provider (gitlab.com and self-hosted instances) and the REST calls behind it. */
+export * from './providers/gitlab'
+export * from './providers/gitlab/api'
+export * from './providers/gitlab/client'
+export * from './providers/gitlab/line-position'
+export * from './providers/gitlab/merge-request-list'
+export * from './providers/gitlab/normalize'
+export * from './providers/gitlab/oauth'
+export * from './providers/gitlab/reviews'
+export * from './providers/gitlab/sharing'
+export * from './providers/gitlab/uploads'
+export * from './providers/gitlab/url'

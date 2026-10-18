@@ -28,6 +28,8 @@ export const LOCAL_RPC = {
   storageRemoveItem: 'storage-remove-item',
   storageGetKeys: 'storage-get-keys',
   githubToken: 'github-token',
+  /** A GitLab token for one host: the environment, or glab's login there. */
+  gitlabToken: 'gitlab-token',
   /** Analysis and chat through a local agent CLI (`plans/11-local-agents.md`). */
   agentList: 'agent-list',
   agentAnalyze: 'agent-analyze',

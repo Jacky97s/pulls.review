@@ -309,6 +309,7 @@ export function createDiffsStore(source: DiffSource, opts: DiffsStoreOptions): D
     reviews,
     shared: shared?.store,
     fileContent,
+    loadImage: source.loadImage,
     canRefresh: !!source.fingerprint,
     auth: source.auth,
     load,

@@ -312,6 +312,8 @@
     "requestChanges": "Запросить изменения",
     "discard": "Отменить ревью",
     "leaveComment": "Оставьте комментарий",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Добавить одиночный комментарий",
     "addToReview": "Добавить комментарий ревью",
     "startReview": "Начать ревью",
@@ -370,7 +372,8 @@
       "behavior": "Поведение",
       "github": "GitHub",
       "ai": "ИИ-анализ",
-      "notSetUp": "Ещё не настроено"
+      "notSetUp": "Ещё не настроено",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "ИИ-анализ",
@@ -388,6 +391,17 @@
       "changeKey": "Сменить ключ",
       "model": "Модель",
       "modelListFailed": "Не удалось загрузить список моделей ({error}). Введите id модели вручную.",
+      "reasoning": "Reasoning",
+      "reasoningHint": "How hard the model thinks before answering. On api.openai.com requests use the Responses API; other endpoints use chat completions, where newer OpenAI models can't call tools while reasoning, so they default to off there.",
+      "reasoningLevels": {
+        "default": "Model default",
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high"
+      },
       "embedUnavailable": "Функции ИИ недоступны во встроенном режиме",
       "embedReason": "Строгая CSP github.com блокирует запросы, необходимые функциям ИИ. {link}, чтобы использовать их.",
       "goToWebsite": "Перейдите на сайт",
@@ -407,6 +421,24 @@
       "free": "Бесплатно",
       "priceTitle": "Вход {input}/M · Выход {output}/M токенов",
       "agentDefault": "По умолчанию для агента"
+    },
+    "gitlab": {
+      "label": "GitLab Personal Access Token",
+      "labelFor": "GitLab token for {host}",
+      "hint": "Needs the read_api scope to read, or api to comment and review. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "generate": "Generate one on this instance →",
+      "tokenSaved": "Token saved",
+      "signIn": "Sign in",
+      "signInTo": "Sign in with {host}",
+      "signedIn": "Signed in",
+      "signingIn": "Signing in to GitLab…",
+      "signInFailed": "GitLab sign-in failed",
+      "backHome": "Back to home",
+      "application": "GitLab Application (optional)",
+      "applicationId": "Application ID",
+      "applicationSaved": "Application saved",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope api, redirect URI {redirectUri}.",
+      "registerApplication": "Register an application on this instance →"
     }
   },
   "rules": {

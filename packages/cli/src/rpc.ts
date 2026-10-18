@@ -5,7 +5,7 @@ import { LOCAL_RPC } from '@pulls.review/core/local-rpc'
 import { DiffsPayloadSchema } from '@pulls.review/core/types'
 import { defineRpcFunction } from 'devframe'
 import * as v from 'valibot'
-import { resolveGithubToken } from './credentials'
+import { resolveGithubToken, resolveGitlabToken } from './credentials'
 
 export interface LocalRpcOptions {
   /** Any directory inside the repository under review. */
@@ -71,5 +71,12 @@ export function localRpcFunctions({ cwd, driver, env }: LocalRpcOptions) {
       handler: ({ base }) => driver.getKeys(base, {}),
     }),
     defineRpcFunction({ name: LOCAL_RPC.githubToken, type: 'query', handler: () => resolveGithubToken(env) }),
+    defineRpcFunction({
+      name: LOCAL_RPC.gitlabToken,
+      type: 'query',
+      args: [v.object({ host: v.string() })],
+      returns: v.optional(v.string()),
+      handler: ({ host }) => resolveGitlabToken(env, host),
+    }),
   ]
 }

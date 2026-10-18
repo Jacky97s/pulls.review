@@ -32,7 +32,7 @@ describe('useUserscriptUpdate', () => {
     await settle()
 
     expect(updateAvailable.value).toBe(true)
-    expect(String(fetchMock.mock.calls[0]![0])).toContain('/repos/antfu/pulls.review/deployments?environment=Production')
+    expect(String(fetchMock.mock.calls[0]![0])).toContain('/repos/Jacky97s/pulls.review/deployments?environment=Production')
   })
 
   it('stays quiet when the installed build is the deployed one', async () => {

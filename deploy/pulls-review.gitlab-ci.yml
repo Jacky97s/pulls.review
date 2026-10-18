@@ -1,0 +1,23 @@
+# Analyzes every merge request with an LLM and posts the grouped summary as a note that
+# links to the pulls.review deployment. Include it from a project's .gitlab-ci.yml:
+#
+#   include:
+#     - remote: https://raw.githubusercontent.com/Jacky97s/pulls.review/main/deploy/pulls-review.gitlab-ci.yml
+#
+# and set these CI/CD variables (masked):
+#   PULLS_REVIEW_IMAGE    the `actions` image: docker build --target actions -t <registry>/pulls-review-actions .
+#   GITLAB_TOKEN          project or group access token, role Reporter or above, scope api
+#                         (CI_JOB_TOKEN cannot post notes)
+#   PULLS_REVIEW_SITE_URL the deployment the note links to, e.g. https://pulls-review.internal
+#   one model key: OPENAI_API_KEY (+ OPENAI_BASE_URL), ANTHROPIC_API_KEY or AI_GATEWAY_API_KEY
+# Optional: PULLS_REVIEW_MODEL, PULLS_REVIEW_PROVIDER, PULLS_REVIEW_LOCALE (e.g. zh-TW).
+pulls-review:
+  stage: test
+  image: $PULLS_REVIEW_IMAGE
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  # Re-runs on an unchanged head reuse the note and cost no model call.
+  script:
+    - pulls-review-actions
+  # A review aid, never a merge gate.
+  allow_failure: true

@@ -10,6 +10,10 @@ export const SourceRefSchema = v.variant('kind', [
   /** What `head` adds since it forked from `base` (`base...head`); either may be a branch, tag or sha. */
   v.object({ kind: v.literal('github-compare'), owner: v.string(), repo: v.string(), base: v.string(), head: v.string() }),
   v.object({ kind: v.literal('github-commit'), owner: v.string(), repo: v.string(), sha: v.string() }),
+  /** `host` is the GitLab instance (`gitlab.com` or self-hosted); `project` its full namespace path, groups included. */
+  v.object({ kind: v.literal('gitlab-mr'), host: v.string(), project: v.string(), iid: v.string() }),
+  v.object({ kind: v.literal('gitlab-compare'), host: v.string(), project: v.string(), base: v.string(), head: v.string() }),
+  v.object({ kind: v.literal('gitlab-commit'), host: v.string(), project: v.string(), sha: v.string() }),
   v.object({ kind: v.literal('paste'), hash: v.string() }),
   /** A local repository (its root path) at a target in git revision syntax; `''` is the working tree. */
   v.object({ kind: v.literal('local'), repo: v.string(), target: v.string() }),
@@ -25,6 +29,12 @@ export function serializeRef(ref: SourceRef): string {
       return `github:${ref.owner}/${ref.repo}@${ref.base}...${ref.head}`
     case 'github-commit':
       return `github:${ref.owner}/${ref.repo}@${ref.sha}`
+    case 'gitlab-mr':
+      return `gitlab:${ref.host}/${ref.project}!${ref.iid}`
+    case 'gitlab-compare':
+      return `gitlab:${ref.host}/${ref.project}@${ref.base}...${ref.head}`
+    case 'gitlab-commit':
+      return `gitlab:${ref.host}/${ref.project}@${ref.sha}`
     case 'paste':
       return `paste:${ref.hash}`
     case 'local':
@@ -37,6 +47,7 @@ export function serializeRef(ref: SourceRef): string {
 export function isListed(ref: SourceRef): boolean {
   switch (ref.kind) {
     case 'github-commit':
+    case 'gitlab-commit':
       return false
     case 'local':
       return parseTarget(ref.target).kind !== 'commit'
@@ -48,10 +59,12 @@ export function isListed(ref: SourceRef): boolean {
 /** Secrets a source may need, read on every use so a token saved later applies at once. */
 export interface Credentials {
   githubToken: () => Promise<string | undefined>
+  /** Tokens are per GitLab instance, so a self-hosted host never receives a gitlab.com token. */
+  gitlabToken?: (host: string) => Promise<string | undefined>
 }
 
-export function staticCredentials(githubToken?: string): Credentials {
-  return { githubToken: async () => githubToken }
+export function staticCredentials(githubToken?: string, gitlabTokens: Record<string, string> = {}): Credentials {
+  return { githubToken: async () => githubToken, gitlabToken: async host => gitlabTokens[host] }
 }
 
 /**
@@ -66,12 +79,17 @@ export interface DiffSource {
   fingerprint?: () => Promise<string>
   /** A file's full content at one of the diff's `base`/`head` shas; `undefined` when the file doesn't exist there. */
   loadFile?: (path: string, sha: string) => Promise<string | undefined>
+  /**
+   * An image the diff's Markdown (description, comments) references that only the host
+   * can serve with these credentials; `undefined` for any other image, which loads as is.
+   */
+  loadImage?: (src: string) => Promise<Blob | undefined>
   /** Who the credentials act as, and whether they may write back; `undefined` when anonymous. */
   viewer?: () => Promise<Viewer | undefined>
   reviews?: ReviewsApi
   sharing?: SharingApi
   /** The credential a failed load can be retried with, so the view can offer to enter it. */
-  auth?: 'github-token'
+  auth?: 'github-token' | 'gitlab-token'
 }
 
 export interface Viewer {

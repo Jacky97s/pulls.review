@@ -4,10 +4,12 @@ import ActionButton from '@antfu/design/components/Action/ActionButton.vue'
 import FeedbackEmptyState from '@antfu/design/components/Feedback/FeedbackEmptyState.vue'
 import FeedbackLoading from '@antfu/design/components/Feedback/FeedbackLoading.vue'
 import { createGithubSource } from '@pulls.review/core/github'
+import { createGitlabSource } from '@pulls.review/core/gitlab'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAppContext } from '../../../../app-context'
 import DiffsPage from '../../../../components/diff/DiffsPage.vue'
+import GitlabTokenSettings from '../../../../components/settings/GitlabTokenSettings.vue'
 import { useCommitView } from '../../../../composables/useCommitView'
 import { useDocumentTitle } from '../../../../composables/useDocumentTitle'
 import { resolveStoredTokenMeta } from '../../../../composables/useGithubTokenMeta'
@@ -24,10 +26,29 @@ const ref = props.sourceRef
 // `?from=<login>` deep-links a shared analysis (see plans/07); read once, never rewritten.
 const from = typeof route.query.from === 'string' ? route.query.from : undefined
 
-const parent = createDiffsStore(createGithubSource(ref, credentials, { tokenMeta: resolveStoredTokenMeta }), { cache, llm, from })
+// Shared-analysis notes link readers back here - an internal deployment, for a self-hosted
+// instance. The CLI's own server is no address to share, so it keeps the default.
+const siteOrigin = import.meta.env.VITE_SITE_URL || (import.meta.env.PR_LOCAL ? undefined : location.origin)
+
+function createSource(ref: RoutableRef) {
+  switch (ref.kind) {
+    case 'gitlab-mr':
+    case 'gitlab-compare':
+    case 'gitlab-commit':
+      return createGitlabSource(ref, credentials, { siteOrigin })
+    default:
+      return createGithubSource(ref, credentials, { tokenMeta: resolveStoredTokenMeta })
+  }
+}
+
+const gitlabHost = 'host' in ref ? ref.host : undefined
+
+const parent = createDiffsStore(createSource(ref), { cache, llm, from })
 const { store, commitNav, selected } = useCommitView(
   parent,
-  sha => createGithubSource({ kind: 'github-commit', owner: ref.owner, repo: ref.repo, sha }, credentials, { tokenMeta: resolveStoredTokenMeta }),
+  sha => createSource('host' in ref
+    ? { kind: 'gitlab-commit', host: ref.host, project: ref.project, sha }
+    : { kind: 'github-commit', owner: ref.owner, repo: ref.repo, sha }),
   { cache, llm },
 )
 
@@ -36,7 +57,7 @@ const { store, commitNav, selected } = useCommitView(
 useDocumentTitle(() => {
   const diff = store.value.diff
   if (!diff)
-    return `${ref.owner}/${ref.repo}`
+    return 'project' in ref ? ref.project : `${ref.owner}/${ref.repo}`
   return diff.label ? `${diff.title} (${diff.label})` : diff.title
 })
 
@@ -68,6 +89,12 @@ onMounted(() => parent.load())
             </ActionButton>
           </template>
         </FeedbackEmptyState>
+        <GitlabTokenSettings
+          v-if="gitlabHost"
+          :host="gitlabHost"
+          class="mxa max-w-200 border border-base border-rounded p4"
+          @saved="retry"
+        />
       </template>
     </DiffsPage>
   </main>

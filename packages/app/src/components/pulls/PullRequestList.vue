@@ -5,6 +5,7 @@ import type { PullRequestSort } from './pull-request-list-query'
 import { useWindowVirtualizer } from '@tanstack/vue-virtual'
 import { useElementBounding } from '@vueuse/core'
 import { computed, useTemplateRef, watch } from 'vue'
+import { listItemRoute } from '../../source-routes'
 import { filterPullRequests, sortPullRequests } from './pull-request-list-query'
 import PullRequestRow from './PullRequestRow.vue'
 
@@ -45,13 +46,13 @@ watch(() => virtualRows.value.at(-1)?.index, (last) => {
   <div ref="list" :style="{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }">
     <div
       v-for="row in virtualRows"
-      :key="rows[row.index]!.number"
+      :key="listItemRoute(store.repository, rows[row.index]!)"
       :ref="measure"
       :data-index="row.index"
       class="absolute left-0 top-0 w-full"
       :style="{ transform: `translateY(${row.start - virtualizer.options.scrollMargin}px)` }"
     >
-      <PullRequestRow :owner="store.owner" :repo="store.repo" :pr="rows[row.index]!" :viewed="store.viewed.get(rows[row.index]!.number)" />
+      <PullRequestRow :repository="store.repository" :pr="rows[row.index]!" :viewed="store.viewed.get(listItemRoute(store.repository, rows[row.index]!))" />
     </div>
   </div>
 </template>

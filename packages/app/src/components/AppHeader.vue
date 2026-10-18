@@ -24,7 +24,7 @@ useEventListener(() => props.document ?? document, 'scroll', (event) => {
 
     <NavControls>
       <ActionIconButton
-        href="https://github.com/antfu/pulls.review"
+        href="https://github.com/Jacky97s/pulls.review"
         target="_blank"
         rel="noopener"
         icon="i-carbon-logo-github"

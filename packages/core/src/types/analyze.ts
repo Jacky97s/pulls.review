@@ -91,7 +91,7 @@ export const SubmittedGroupLeafSchema = v.object({
   label: v.pipe(v.string(), v.description('Short, human-readable display name for this group.')),
   summary: v.optional(v.pipe(v.string(), v.description('Concise explanation of the intention of this group (why over what). Rendered as Markdown.'))), // populated only when an llm/web-llm adapter has run
   category: v.pipe(DiffCategorySchema, v.description(`Which part of the system this group touches. ${CATEGORY_GUIDE}`)),
-  filePaths: v.pipe(v.array(v.string()), v.description('File paths belonging directly to this group (not to a child). Every file path given to you MUST end up in exactly one group or child - never both, never omitted.')), // references into DiffsPayload.files by path
+  filePaths: v.pipe(v.array(v.string()), v.description('File paths belonging directly to this group (not to a child). Each file path given to you belongs to exactly one group or child: submit_grouping rejects a grouping that omits or repeats one.')), // references into DiffsPayload.files by path
   critical: v.optional(v.pipe(v.boolean(), v.description('Set only when the whole group deserves extra reviewer care (security, data loss, hard to revert). Most groups are not critical.'))),
   fileNotes: v.optional(v.pipe(v.array(FileNoteSchema), v.description('Optional notes about a whole file. Add one only where it saves the reviewer time; never explain the obvious. Most files need none.'))),
   lineNotes: v.optional(v.pipe(v.array(LineNoteSchema), v.description('Optional notes about one specific line. Same bar as fileNotes; prefer a line note when the point is about one spot in the diff.'))),
