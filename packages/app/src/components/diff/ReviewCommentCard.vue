@@ -7,6 +7,7 @@ import DisplayDate from '@antfu/design/components/Display/DisplayDate.vue'
 import FormTextarea from '@antfu/design/components/Form/FormTextarea.vue'
 import { Markdown } from '@comark/vue'
 import { ref } from 'vue'
+import { useMarkdownImages } from '../../composables/useMarkdownImages'
 import GithubAvatar from '../GithubAvatar.vue'
 
 const props = defineProps<{
@@ -20,6 +21,8 @@ const emit = defineEmits<{
   edit: [body: string]
   delete: []
 }>()
+
+const body = useMarkdownImages(() => props.comment.body)
 
 const editing = ref(false)
 const draft = ref('')
@@ -62,7 +65,7 @@ function saveEdit() {
       </div>
     </div>
     <Suspense v-else>
-      <Markdown :value="comment.body" class="review-comment-markdown text-sm" />
+      <Markdown :value="body" class="review-comment-markdown text-sm" />
     </Suspense>
   </article>
 </template>

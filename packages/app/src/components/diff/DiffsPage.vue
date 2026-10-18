@@ -12,6 +12,7 @@ import { useElementBounding, useElementSize, useEventListener } from '@vueuse/co
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, useId, useTemplateRef, watch } from 'vue'
 import { scrollToAnchor } from '../../composables/scrollToFile'
 import { useDragResize } from '../../composables/useDragResize'
+import { markdownImageLoaderKey, useMarkdownImages } from '../../composables/useMarkdownImages'
 import { autoRefresh } from '../../state/auto-refresh'
 import { CHAT_PANEL_DOCK_MIN_WIDTH } from '../../state/chat-panel'
 import { GROUP_SIDEBAR_MAX_RATIO, GROUP_SIDEBAR_MIN_WIDTH, groupSidebarWidth, isWide, showGroupSidebar } from '../../state/group-nav'
@@ -58,6 +59,10 @@ const groups = computed(() => props.store?.groups ?? [])
 const virtualizer = new Virtualizer()
 provide(diffVirtualizerKey, virtualizer)
 provide(fileCollapseKey, reactive(new Map<string, boolean>()))
+provide(markdownImageLoaderKey, props.store?.loadImage)
+
+// Passed, not injected: a component can't inject what it provides itself.
+const description = useMarkdownImages(() => props.store?.diff?.description ?? '', props.store?.loadImage)
 const rootEl = useTemplateRef<HTMLElement>('root')
 onMounted(() => {
   virtualizer.setup(props.document && !(props.document instanceof Document) ? rootEl.value! : document)
@@ -297,7 +302,7 @@ function refreshFromBanner() {
               >
                 <div ref="descriptionBody">
                   <Suspense>
-                    <Markdown :value="diff.description" v-bind="descriptionMarkdown" class="description-markdown min-w-0" />
+                    <Markdown :value="description" v-bind="descriptionMarkdown" class="description-markdown min-w-0" />
                   </Suspense>
                 </div>
               </div>

@@ -28,6 +28,7 @@ GitLab support - gitlab.com and self-hosted instances - next to GitHub, for runn
 - OpenAI models that reason by default (gpt-5.4 and later) failed to call tools on chat completions.
 - The analysis prompts called every diff a GitHub pull request; tool descriptions now state their limits, and Claude gets room for adaptive thinking.
 - A GitLab username no longer pulls in the avatar of a same-named GitHub user.
+- Images uploaded to a GitLab merge request (`/uploads/...`) now show in its description and comments: they load through the API with your token, since GitLab serves them only to a signed-in browser.
 
 ### Changed
 

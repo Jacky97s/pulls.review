@@ -6,6 +6,7 @@ import { createGitlabClient } from './client'
 import { normalizeFiles, normalizeMergeRequest } from './normalize'
 import { createGitlabReviewsApi, fetchGitlabViewer } from './reviews'
 import { createGitlabSharingApi } from './sharing'
+import { fetchGitlabUpload, parseGitlabUpload } from './uploads'
 
 export interface GitlabSourceOptions {
   /** Where shared-analysis notes link to: the deployment readers open (default pulls.review). */
@@ -36,6 +37,10 @@ export function createGitlabMergeRequestSource(ref: { host: string, project: str
     },
     fingerprint: async () => (await fetchMergeRequest(client, project, iid)).sha,
     loadFile,
+    async loadImage(src) {
+      const upload = parseGitlabUpload(src, host, project)
+      return upload && fetchGitlabUpload(client, upload)
+    },
     viewer: () => fetchGitlabViewer(client),
     reviews: createGitlabReviewsApi(client, { project, iid }, { files: () => files ?? (files = fetchPayload().then(diff => diff.files)) }),
     sharing: createGitlabSharingApi(client, { host, project, iid }, siteOrigin),

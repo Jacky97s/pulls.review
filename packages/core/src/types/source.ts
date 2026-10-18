@@ -79,6 +79,11 @@ export interface DiffSource {
   fingerprint?: () => Promise<string>
   /** A file's full content at one of the diff's `base`/`head` shas; `undefined` when the file doesn't exist there. */
   loadFile?: (path: string, sha: string) => Promise<string | undefined>
+  /**
+   * An image the diff's Markdown (description, comments) references that only the host
+   * can serve with these credentials; `undefined` for any other image, which loads as is.
+   */
+  loadImage?: (src: string) => Promise<Blob | undefined>
   /** Who the credentials act as, and whether they may write back; `undefined` when anonymous. */
   viewer?: () => Promise<Viewer | undefined>
   reviews?: ReviewsApi

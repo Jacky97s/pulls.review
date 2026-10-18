@@ -174,6 +174,8 @@ export interface DiffsStore {
   readonly auth?: 'github-token' | 'gitlab-token'
   /** `undefined` = this source can't fetch a file's full content (a paste has no live origin). */
   readonly fileContent?: DiffsStoreFileContent
+  /** Images in the diff's Markdown only the source can serve (a private GitLab's uploads); see `DiffSource.loadImage`. */
+  readonly loadImage?: (src: string) => Promise<Blob | undefined>
   load: () => Promise<void>
   refresh: () => Promise<void>
   /** Marks (or unmarks) files by `sha`; either way clears their `changedSinceReviewed` flag. */
