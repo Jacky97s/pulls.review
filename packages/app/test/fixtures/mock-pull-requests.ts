@@ -59,8 +59,7 @@ export const mockPullRequests: PullRequestListItem[] = [
 
 export function createMockPullRequestListStore(overrides: Partial<PullRequestListStore> = {}): PullRequestListStore {
   return reactive({
-    owner: 'antfu',
-    repo: 'pulls.review',
+    repository: { owner: 'antfu', repo: 'pulls.review' },
     items: mockPullRequests,
     totalCount: mockPullRequests.length,
     isLoading: false,

@@ -42,3 +42,15 @@ describe('github avatar source', () => {
     expect(wrapper.find('img').exists()).toBe(true)
   })
 })
+
+describe('github avatar without a GitHub account', () => {
+  it('shows the initial instead of looking a non-GitHub name up on github.com', () => {
+    const wrapper = mount(GithubAvatar, {
+      props: { login: 'alice', avatarUrl: '', size: 18 },
+      global: { plugins: [i18n] },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.text()).toBe('A')
+  })
+})

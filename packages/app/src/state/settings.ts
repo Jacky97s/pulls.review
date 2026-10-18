@@ -4,8 +4,21 @@ import { defaultLlmSettings, deriveProvider } from '@pulls.review/core/analyze'
 import { detectLocale, isLocale } from '@pulls.review/core/locales'
 import { useLocalStorage } from '@vueuse/core'
 
+/** How this browser authenticates to one GitLab instance. */
+export interface GitlabHostAuth {
+  /** A personal access token, or the access token of an OAuth sign-in. */
+  token: string
+  /** Set for an OAuth sign-in: renews `token` once it nears `expiresAt` (epoch ms). */
+  refreshToken?: string
+  expiresAt?: number
+  /** The GitLab Application to sign in through, when this host has no build-time one. */
+  clientId?: string
+}
+
 export interface Settings {
   githubToken: string
+  /** Keyed by host (`gitlab.com`, `gitlab.example.com:8443`); a token is only sent to its own host. */
+  gitlab: Record<string, GitlabHostAuth>
   llm: LlmSettings
   /** UI language and the language the LLM writes summaries in; seeded from the browser's preference. */
   locale: Locale
@@ -13,6 +26,7 @@ export interface Settings {
 
 const defaultSettings: Settings = {
   githubToken: '',
+  gitlab: {},
   llm: defaultLlmSettings,
   locale: detectLocale(),
 }

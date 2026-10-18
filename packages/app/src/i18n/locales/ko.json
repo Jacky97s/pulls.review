@@ -370,7 +370,8 @@
       "behavior": "동작",
       "github": "GitHub",
       "ai": "AI 분석",
-      "notSetUp": "아직 설정되지 않음"
+      "notSetUp": "아직 설정되지 않음",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "AI 분석",
@@ -388,6 +389,17 @@
       "changeKey": "키 변경",
       "model": "모델",
       "modelListFailed": "모델 목록을 불러올 수 없습니다 ({error}). 모델 id를 직접 입력하세요.",
+      "reasoning": "Reasoning",
+      "reasoningHint": "How hard the model thinks before answering. On api.openai.com requests use the Responses API; other endpoints use chat completions, where newer OpenAI models can't call tools while reasoning, so they default to off there.",
+      "reasoningLevels": {
+        "default": "Model default",
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high"
+      },
       "embedUnavailable": "임베드 모드에서는 AI 기능을 사용할 수 없습니다",
       "embedReason": "github.com의 엄격한 CSP가 AI 기능에 필요한 요청을 차단합니다. 사용하려면 {link}.",
       "goToWebsite": "웹사이트로 이동",
@@ -407,6 +419,24 @@
       "free": "무료",
       "priceTitle": "입력 {input}/M · 출력 {output}/M 토큰",
       "agentDefault": "에이전트 기본값"
+    },
+    "gitlab": {
+      "label": "GitLab Personal Access Token",
+      "labelFor": "GitLab token for {host}",
+      "hint": "Needs the read_api scope. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "generate": "Generate one on this instance →",
+      "tokenSaved": "Token saved",
+      "signIn": "Sign in",
+      "signInTo": "Sign in with {host}",
+      "signedIn": "Signed in",
+      "signingIn": "Signing in to GitLab…",
+      "signInFailed": "GitLab sign-in failed",
+      "backHome": "Back to home",
+      "application": "GitLab Application (optional)",
+      "applicationId": "Application ID",
+      "applicationSaved": "Application saved",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope read_api, redirect URI {redirectUri}.",
+      "registerApplication": "Register an application on this instance →"
     }
   },
   "rules": {

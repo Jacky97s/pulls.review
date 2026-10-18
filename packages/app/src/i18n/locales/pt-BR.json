@@ -370,7 +370,8 @@
       "behavior": "Comportamento",
       "github": "GitHub",
       "ai": "Análise com IA",
-      "notSetUp": "Ainda não configurado"
+      "notSetUp": "Ainda não configurado",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "Análise de IA",
@@ -388,6 +389,17 @@
       "changeKey": "Alterar chave",
       "model": "Modelo",
       "modelListFailed": "Não foi possível carregar a lista de modelos ({error}). Digite um id de modelo manualmente.",
+      "reasoning": "Reasoning",
+      "reasoningHint": "How hard the model thinks before answering. On api.openai.com requests use the Responses API; other endpoints use chat completions, where newer OpenAI models can't call tools while reasoning, so they default to off there.",
+      "reasoningLevels": {
+        "default": "Model default",
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high"
+      },
       "embedUnavailable": "Os recursos de IA não estão disponíveis no modo incorporado",
       "embedReason": "A rígida CSP do github.com bloqueia as solicitações de que os recursos de IA precisam aqui. {link} para usá-los.",
       "goToWebsite": "Acesse o site",
@@ -407,6 +419,24 @@
       "free": "Grátis",
       "priceTitle": "Entrada {input}/M · Saída {output}/M tokens",
       "agentDefault": "Padrão do agente"
+    },
+    "gitlab": {
+      "label": "GitLab Personal Access Token",
+      "labelFor": "GitLab token for {host}",
+      "hint": "Needs the read_api scope. Each GitLab instance (gitlab.com or self-hosted) keeps its own token.",
+      "generate": "Generate one on this instance →",
+      "tokenSaved": "Token saved",
+      "signIn": "Sign in",
+      "signInTo": "Sign in with {host}",
+      "signedIn": "Signed in",
+      "signingIn": "Signing in to GitLab…",
+      "signInFailed": "GitLab sign-in failed",
+      "backHome": "Back to home",
+      "application": "GitLab Application (optional)",
+      "applicationId": "Application ID",
+      "applicationSaved": "Application saved",
+      "applicationHint": "To sign in instead of pasting a token, register an application on this instance: not confidential, scope read_api, redirect URI {redirectUri}.",
+      "registerApplication": "Register an application on this instance →"
     }
   },
   "rules": {

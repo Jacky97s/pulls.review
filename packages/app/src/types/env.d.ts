@@ -20,6 +20,8 @@ interface ImportMetaEnv {
    * local git diff. Same truthiness-only testing rule as `PR_LLM`.
    */
   readonly PR_LOCAL: boolean
+  /** `host=clientId` pairs (comma-separated) of the GitLab Applications users sign in through; see `state/gitlab-auth.ts`. */
+  readonly VITE_GITLAB_OAUTH_CLIENTS?: string
   /** Short git sha the embed bundle was built from; only defined by `vite.config.embed.ts`. */
   readonly PR_EMBED_SHA: string | undefined
 }

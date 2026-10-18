@@ -370,7 +370,8 @@
       "behavior": "行为",
       "github": "GitHub",
       "ai": "AI 分析",
-      "notSetUp": "尚未设置"
+      "notSetUp": "尚未设置",
+      "gitlab": "GitLab"
     },
     "llm": {
       "title": "AI 分析",
@@ -388,6 +389,17 @@
       "changeKey": "更换 key",
       "model": "模型",
       "modelListFailed": "无法加载模型列表（{error}）。请手动输入模型 id。",
+      "reasoning": "推理",
+      "reasoningHint": "模型回答前思考的程度。api.openai.com 使用 Responses API；其他端点使用 chat completions，新版 OpenAI 模型在那里无法边推理边调用工具，因此默认关闭。",
+      "reasoningLevels": {
+        "default": "模型默认",
+        "off": "关闭",
+        "minimal": "极低",
+        "low": "低",
+        "medium": "中",
+        "high": "高",
+        "xhigh": "极高"
+      },
       "embedUnavailable": "嵌入模式下不可用 AI 功能",
       "embedReason": "github.com 严格的 CSP 会阻止 AI 功能所需的请求。{link} 即可使用。",
       "goToWebsite": "前往网站",
@@ -407,6 +419,24 @@
       "free": "免费",
       "priceTitle": "输入 {input}/M · 输出 {output}/M tokens",
       "agentDefault": "代理默认"
+    },
+    "gitlab": {
+      "label": "GitLab 个人访问令牌",
+      "labelFor": "{host} 的 GitLab 令牌",
+      "hint": "需要 read_api 权限。每个 GitLab 实例（gitlab.com 或自托管）各自保存令牌。",
+      "generate": "在此实例生成令牌 →",
+      "tokenSaved": "已保存令牌",
+      "signIn": "登录",
+      "signInTo": "使用 {host} 登录",
+      "signedIn": "已登录",
+      "signingIn": "正在登录 GitLab…",
+      "signInFailed": "GitLab 登录失败",
+      "backHome": "返回首页",
+      "application": "GitLab Application（可选）",
+      "applicationId": "Application ID",
+      "applicationSaved": "已保存 Application",
+      "applicationHint": "若要用登录代替粘贴令牌，请在此实例注册 Application：不勾选 Confidential，scope 选 read_api，Redirect URI 填 {redirectUri}。",
+      "registerApplication": "在此实例注册 Application →"
     }
   },
   "rules": {

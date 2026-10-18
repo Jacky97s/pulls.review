@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import type { ChecksStatus, PullRequestListItem, ReviewDecision } from '@pulls.review/core/types'
+import type { ListedRepository } from '../../source-routes'
 import type { ViewedPullRequest } from '../../stores/pull-request-list-store'
 import { labelStyle } from '@antfu/design/utils/color'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatTimeAgo } from '../../i18n/time-ago'
-import { routeForRef } from '../../source-routes'
+import { listItemLabel, listItemRoute } from '../../source-routes'
 import { isDark } from '../../state/dark'
 import DiffStats from '../diff/DiffStats.vue'
 import PrStatusIcon from '../diff/PrStatusIcon.vue'
 import GithubAvatar from '../GithubAvatar.vue'
 
 const props = defineProps<{
-  owner: string
-  repo: string
+  repository: ListedRepository
   pr: PullRequestListItem
   /** Set when this browser already viewed the PR - what the cache holds for it. */
   viewed?: ViewedPullRequest
@@ -48,7 +48,7 @@ const REVIEW_ICON: Record<ReviewDecision, string> = {
 
 <template>
   <RouterLink
-    :to="routeForRef({ kind: 'github-pr', owner, repo, number: String(pr.number) })"
+    :to="listItemRoute(repository, pr.number)"
     class="flex items-start gap-3 border-b border-base px-4 py-3 transition hover:bg-hover"
   >
     <PrStatusIcon :state="pr.state" class="mt-0.5" />
@@ -74,7 +74,7 @@ const REVIEW_ICON: Record<ReviewDecision, string> = {
       </div>
 
       <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs op-fade">
-        <span>#{{ pr.number }}</span>
+        <span>{{ listItemLabel(repository, pr.number) }}</span>
         <i18n-t keypath="pulls.openedBy" tag="span" scope="global">
           <template #time>
             <time :datetime="pr.createdAt" :title="new Date(pr.createdAt).toLocaleString(locale)">{{ openedAgo }}</time>
