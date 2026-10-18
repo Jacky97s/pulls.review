@@ -44,7 +44,7 @@ or any self-hosted instance, on the site, the CLI and (later) GitLab CI.
 | S2 | App: `/gl/{host}/{project}/-/merge_requests/{iid}` (and compare/commit) routes, `source-routes`, per-host token settings, URL box accepts GitLab URLs, CORS error | dev server + browser on a gitlab.com MR and a self-hosted MR |
 | S2b | Sign in with a GitLab Application (OAuth authorization code + PKCE, no client secret): per-host `clientId` from build-time config (one app registered by an admin for the internal deployment) or entered in Settings; refresh tokens kept per host | browser sign-in round trip on gitlab1; token refresh after expiry |
 | S3 | Project MR list at `/gl/{host}/{project}` | browser |
-| S4 | CLI accepts GitLab URLs; tokens from `GITLAB_TOKEN`/`GITLAB_HOST` | run the CLI |
+| S4 | CLI accepts GitLab URLs (any instance, or `group/project!iid`); per host, the token is `PULLS_REVIEW_GITLAB_TOKEN`/`GITLAB_TOKEN` when `GITLAB_HOST` names it (default gitlab.com), else `glab config get token --host` | run the CLI against a gitlab1 MR |
 | S5 | Review threads: diff discussions as threads, the viewer's draft notes as the pending review (negative ids), reply/edit/delete/resolve, submit via `draft_notes/bulk_publish` (`reviewer_state=requested_changes` for request changes) plus `/approve`; unchanged lines carry both `old_line` and `new_line`, ranges a `line_code`. Writes need the `api` scope, which OAuth now requests; `read_api` tokens stay read-only | co-located vitest; a real comment round trip on gitlab1 |
 | S6 | (deferred) Shared analysis as an MR note; GitLab CI job in place of `action.yml` | own plan |
 

@@ -66,4 +66,16 @@ describe('pageFor', () => {
   it('rejects a revision that would read as an option', async () => {
     await expect(pageFor(repo, '--all', false)).rejects.toThrow(/Invalid revision/)
   })
+
+  it('opens GitLab merge requests, compares, commits and projects from any instance', async () => {
+    expect(await pageFor(repo, 'https://gitlab1.program.com.tw/qa/tools/-/merge_requests/7', false)).toBe('/gl/gitlab1.program.com.tw/qa/tools/-/merge_requests/7')
+    expect(await pageFor(repo, 'group/sub/proj!3', false)).toBe('/gl/gitlab.com/group/sub/proj/-/merge_requests/3')
+    expect(await pageFor(repo, 'https://gitlab.com/a/b/-/compare/main...feat', false)).toBe('/gl/gitlab.com/a/b/-/compare/main...feat')
+    expect(await pageFor(repo, 'https://gitlab.com/a/b', false)).toBe('/gl/gitlab.com/a/b')
+  })
+
+  it('still reads a local range or branch rather than a GitLab URL', async () => {
+    expect(await pageFor(repo, 'main...HEAD', false)).toBe('/compare/main...HEAD')
+    expect(await pageFor(repo, 'main', false)).toBe('/branch/main')
+  })
 })

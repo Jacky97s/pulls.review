@@ -13,6 +13,16 @@ export function githubTokenFromEnv(env: Env): string | undefined {
   return first(env.PULLS_REVIEW_GITHUB_TOKEN, env.GITHUB_TOKEN)
 }
 
+/** The instance a `GITLAB_TOKEN` belongs to, as glab reads it: `GITLAB_HOST`, else gitlab.com. */
+function gitlabTokenHost(env: Env): string {
+  return (first(env.GITLAB_HOST) ?? 'gitlab.com').replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase()
+}
+
+/** A GitLab token for `host`, only when the environment names that host - never another instance's token. */
+export function gitlabTokenFromEnv(env: Env, host: string): string | undefined {
+  return gitlabTokenHost(env) === host ? first(env.PULLS_REVIEW_GITLAB_TOKEN, env.GITLAB_TOKEN) : undefined
+}
+
 /**
  * Explicit overrides (CLI flags) win over `PULLS_REVIEW_*`, which win over each provider's conventional variable.
  * Without an explicit provider, the first conventional key found picks it, in the same
