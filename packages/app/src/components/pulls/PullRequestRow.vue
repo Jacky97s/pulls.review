@@ -48,7 +48,7 @@ const REVIEW_ICON: Record<ReviewDecision, string> = {
 
 <template>
   <RouterLink
-    :to="listItemRoute(repository, pr.number)"
+    :to="listItemRoute(repository, pr)"
     class="flex items-start gap-3 border-b border-base px-4 py-3 transition hover:bg-hover"
   >
     <PrStatusIcon :state="pr.state" class="mt-0.5" />
@@ -74,7 +74,7 @@ const REVIEW_ICON: Record<ReviewDecision, string> = {
       </div>
 
       <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs op-fade">
-        <span>{{ listItemLabel(repository, pr.number) }}</span>
+        <span>{{ listItemLabel(repository, pr) }}</span>
         <i18n-t keypath="pulls.openedBy" tag="span" scope="global">
           <template #time>
             <time :datetime="pr.createdAt" :title="new Date(pr.createdAt).toLocaleString(locale)">{{ openedAgo }}</time>

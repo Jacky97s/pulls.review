@@ -24,6 +24,8 @@ export type ChecksStatus = v.InferOutput<typeof ChecksStatusSchema>
 
 export const PullRequestListItemSchema = v.object({
   number: v.number(),
+  /** The item's own project, when the list spans several (a GitLab group); absent for a single repository's list. */
+  repository: v.optional(v.string()),
   title: v.string(),
   url: v.string(), // html permalink on github.com
   state: v.picklist(['open', 'draft']),

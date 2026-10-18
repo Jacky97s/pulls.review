@@ -50,9 +50,17 @@ describe('gitlab source routes', () => {
   it('links a merge request back to its project list', () => {
     expect(parentForRef({ kind: 'gitlab-mr', host: 'self.host', project: 'g/s/p', iid: '1' })).toEqual({ route: '/gl/self.host/g/s/p', label: 'g/s/p' })
     expect(routeFromUrl('https://self.host/g/s/p/-/merge_requests')).toBe('/gl/self.host/g/s/p')
-    expect(listItemRoute({ host: 'self.host', project: 'g/p' }, 3)).toBe('/gl/self.host/g/p/-/merge_requests/3')
-    expect(listItemLabel({ host: 'self.host', project: 'g/p' }, 3)).toBe('!3')
-    expect(listItemLabel({ owner: 'o', repo: 'r' }, 3)).toBe('#3')
+    expect(listItemRoute({ host: 'self.host', project: 'g/p' }, { number: 3 })).toBe('/gl/self.host/g/p/-/merge_requests/3')
+    expect(listItemLabel({ host: 'self.host', project: 'g/p' }, { number: 3 })).toBe('!3')
+    expect(listItemLabel({ owner: 'o', repo: 'r' }, { number: 3 })).toBe('#3')
+  })
+
+  it('links a group\'s merge requests to their own projects', () => {
+    const group = { host: 'self.host', project: 'team' }
+    expect(listItemRoute(group, { number: 3, repository: 'team/sub/svc' })).toBe('/gl/self.host/team/sub/svc/-/merge_requests/3')
+    expect(listItemLabel(group, { number: 3, repository: 'team/sub/svc' })).toBe('svc!3')
+    expect(routeFromUrl('https://self.host/groups/team/-/merge_requests')).toBe('/gl/self.host/team')
+    expect(router.resolve('/gl/self.host/team').name).toBeUndefined()
   })
 
   it('reads gitlab.com and self-hosted merge request URLs', () => {

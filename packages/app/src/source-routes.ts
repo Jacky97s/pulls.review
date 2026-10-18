@@ -80,23 +80,28 @@ export function repoRoute(owner: string, repo: string): string {
   return `/gh/${owner}/${repo}`
 }
 
-/** A repository with a list of open pull/merge requests: GitHub's `owner/repo`, or a project on a GitLab host. */
+/** A repository with a list of open pull/merge requests: GitHub's `owner/repo`, or a GitLab project or group on a host. */
 export type ListedRepository = { owner: string, repo: string } | { host: string, project: string }
 
 export function repositoryRoute(repository: ListedRepository): string {
   return 'host' in repository ? `/gl/${repository.host}/${repository.project}` : repoRoute(repository.owner, repository.repo)
 }
 
+/** A listed request: its number, and its own project when the list spans a GitLab group. */
+export interface ListedItem { number: number, repository?: string }
+
 /** The diff page of one listed pull/merge request. */
-export function listItemRoute(repository: ListedRepository, number: number): string {
+export function listItemRoute(repository: ListedRepository, { number, repository: itemProject }: ListedItem): string {
   return 'host' in repository
-    ? routeForRef({ kind: 'gitlab-mr', host: repository.host, project: repository.project, iid: String(number) })
+    ? routeForRef({ kind: 'gitlab-mr', host: repository.host, project: itemProject ?? repository.project, iid: String(number) })
     : routeForRef({ kind: 'github-pr', owner: repository.owner, repo: repository.repo, number: String(number) })
 }
 
-/** How the host writes a request's number: GitHub's `#12`, GitLab's `!12`. */
-export function listItemLabel(repository: ListedRepository, number: number): string {
-  return `${'host' in repository ? '!' : '#'}${number}`
+/** How the host writes a request's number: GitHub's `#12`, GitLab's `!12` - prefixed by its project in a group's list. */
+export function listItemLabel(repository: ListedRepository, { number, repository: itemProject }: ListedItem): string {
+  if (!('host' in repository))
+    return `#${number}`
+  return itemProject ? `${itemProject.slice(itemProject.lastIndexOf('/') + 1)}!${number}` : `!${number}`
 }
 
 /** The repository's breadcrumb: its namespace and its name, each linked to the host's own pages. */
@@ -108,6 +113,13 @@ export function repositoryCrumbs(repository: ListedRepository): { namespace: { l
     }
   }
   const slash = repository.project.lastIndexOf('/')
+  // A top-level group has no namespace above it: the instance stands in.
+  if (slash === -1) {
+    return {
+      namespace: { label: repository.host, url: `https://${repository.host}` },
+      name: { label: repository.project, url: `https://${repository.host}/groups/${repository.project}/-/merge_requests` },
+    }
+  }
   const namespace = repository.project.slice(0, slash)
   return {
     namespace: { label: namespace, url: `https://${repository.host}/${namespace}` },

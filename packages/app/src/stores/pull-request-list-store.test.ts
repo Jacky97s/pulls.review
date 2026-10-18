@@ -145,9 +145,9 @@ describe('createPullRequestListStore', () => {
     await vi.waitFor(() => expect(store.viewed.size).toBe(2))
 
     // Two rule-based groups (source vs docs) when no AI result is stored.
-    expect(store.viewed.get(1)).toEqual({ additions: 15, deletions: 2, files: 2, groups: 2, hasAiResult: false })
-    expect(store.viewed.get(2)).toMatchObject({ groups: 1, hasAiResult: true })
-    expect(store.viewed.has(3)).toBe(false)
+    expect(store.viewed.get('/gh/o/r/1')).toEqual({ additions: 15, deletions: 2, files: 2, groups: 2, hasAiResult: false })
+    expect(store.viewed.get('/gh/o/r/2')).toMatchObject({ groups: 1, hasAiResult: true })
+    expect(store.viewed.has('/gh/o/r/3')).toBe(false)
   })
 
   it('drops a continuation that resolves after a refresh replaced the list', async () => {

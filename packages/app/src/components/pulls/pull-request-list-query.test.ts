@@ -52,3 +52,11 @@ describe('sortPullRequests', () => {
     expect(items.map(pr => pr.number)).toEqual([1, 2, 30])
   })
 })
+
+describe('filtering a GitLab group list', () => {
+  it('matches an item by its project and by !number', () => {
+    const groupItems = [item({ number: 3, title: 'one', repository: 'team/svc-a' }), item({ number: 3, title: 'two', repository: 'team/svc-b' })]
+    expect(filterPullRequests(groupItems, 'svc-b').map(item => item.title)).toEqual(['two'])
+    expect(filterPullRequests(groupItems, '!3')).toHaveLength(2)
+  })
+})

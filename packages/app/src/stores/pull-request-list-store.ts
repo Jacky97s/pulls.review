@@ -1,10 +1,12 @@
 import type { CacheRepositories } from '@pulls.review/core/cache'
+import type { GitlabNamespaceKind } from '@pulls.review/core/gitlab'
 import type { Credentials, PullRequestListItem, PullRequestListPage, SourceRef } from '@pulls.review/core/types'
 import type { ListedRepository } from '../source-routes'
 import { createGithubClient, fetchOpenPullRequests } from '@pulls.review/core/github'
-import { createGitlabClient, fetchOpenMergeRequests } from '@pulls.review/core/gitlab'
+import { createGitlabClient, fetchOpenMergeRequests, resolveGitlabNamespace } from '@pulls.review/core/gitlab'
 import { computed, reactive, ref, shallowRef } from 'vue'
 import { ruleBasedAdapter } from '../analyze'
+import { listItemRoute } from '../source-routes'
 
 /** What this browser already holds for a PR it viewed before (see `pr:*` in the cache). */
 export interface ViewedPullRequest {
@@ -28,8 +30,8 @@ export interface PullRequestListStore {
   readonly isLoadingMore: boolean
   readonly hasMore: boolean
   readonly error: Error | undefined
-  /** Locally cached diffs of this repo, by PR/MR number. */
-  readonly viewed: ReadonlyMap<number, ViewedPullRequest>
+  /** Locally cached diffs of this repo, by the item's `listItemRoute` - numbers repeat across a GitLab group's projects. */
+  readonly viewed: ReadonlyMap<string, ViewedPullRequest>
   load: () => Promise<void>
   refresh: () => Promise<void>
   loadMore: () => Promise<void>
@@ -48,19 +50,31 @@ export interface PullRequestListStoreOptions {
  * cost nothing to refetch (no AI run hangs off them), so unlike `DiffsStore` the
  * refresh happens silently on every visit.
  */
+/**
+ * A GitLab path's pages: a project's merge requests, or a group's with its subgroups'.
+ * Which one it is resolves once, on the first page.
+ */
+function gitlabPages(path: string, client: ReturnType<typeof createGitlabClient>) {
+  let kind: Promise<GitlabNamespaceKind> | undefined
+  return async (next?: string) => fetchOpenMergeRequests(client, path, next, await (kind ??= resolveGitlabNamespace(client, path)))
+}
+
 export function createPullRequestListStore(repository: ListedRepository, opts: PullRequestListStoreOptions): PullRequestListStore {
   const { cache } = opts
   const fetchPage = 'host' in repository
-    ? ((client => (next?: string) => fetchOpenMergeRequests(client, repository.project, next))(createGitlabClient(repository.host, opts.credentials)))
+    ? gitlabPages(repository.project, createGitlabClient(repository.host, opts.credentials))
     : ((client => (next?: string) => fetchOpenPullRequests(client, repository.owner, repository.repo, next))(createGithubClient(opts.credentials)))
   // The list cache is keyed by GitHub's `owner/repo` and feeds the home page's recent
   // repositories as GitHub links, so a GitLab list is always fetched fresh instead.
   const listCache = 'owner' in repository ? { owner: repository.owner, repo: repository.repo } : undefined
-  /** The number of a cached diff that belongs to this repository. */
-  function numberOf(ref: SourceRef): number | undefined {
-    if ('host' in repository)
-      return ref.kind === 'gitlab-mr' && ref.host === repository.host && ref.project === repository.project ? Number(ref.iid) : undefined
-    return ref.kind === 'github-pr' && ref.owner === repository.owner && ref.repo === repository.repo ? Number(ref.number) : undefined
+  /** The list row a cached diff belongs to; a group's list holds its subgroups' projects too. */
+  function itemOf(ref: SourceRef): { number: number, repository?: string } | undefined {
+    if ('host' in repository) {
+      const inList = ref.kind === 'gitlab-mr' && ref.host === repository.host
+        && (ref.project === repository.project || ref.project.startsWith(`${repository.project}/`))
+      return inList ? { number: Number(ref.iid), repository: ref.project === repository.project ? undefined : ref.project } : undefined
+    }
+    return ref.kind === 'github-pr' && ref.owner === repository.owner && ref.repo === repository.repo ? { number: Number(ref.number) } : undefined
   }
   const items = shallowRef<PullRequestListItem[]>([])
   const totalCount = ref<number>()
@@ -69,7 +83,7 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
   const isRefreshing = ref(false)
   const isLoadingMore = ref(false)
   const error = ref<Error>()
-  const viewed = shallowRef(new Map<number, ViewedPullRequest>())
+  const viewed = shallowRef(new Map<string, ViewedPullRequest>())
   // Bumped by every first-page fetch so a slower, older response can't overwrite a newer list.
   let generation = 0
 
@@ -97,14 +111,14 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
   }
 
   async function loadViewed() {
-    const next = new Map<number, ViewedPullRequest>()
-    const entries = await cache.diffs.listMatching(({ ref }) => numberOf(ref) !== undefined)
+    const next = new Map<string, ViewedPullRequest>()
+    const entries = await cache.diffs.listMatching(({ ref }) => itemOf(ref) !== undefined)
     for (const entry of entries) {
-      const number = numberOf(entry.diff.ref)
-      if (number === undefined)
+      const item = itemOf(entry.diff.ref)
+      if (!item)
         continue
       const aiResult = entry.analyzedBy.llm ?? entry.analyzedBy['web-llm']
-      next.set(number, {
+      next.set(listItemRoute(repository, item), {
         additions: entry.diff.files.reduce((sum, file) => sum + file.additions, 0),
         deletions: entry.diff.files.reduce((sum, file) => sum + file.deletions, 0),
         files: entry.diff.files.length,

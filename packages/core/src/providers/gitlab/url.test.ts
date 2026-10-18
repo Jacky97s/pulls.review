@@ -30,4 +30,10 @@ describe('parseGitlabUrl', () => {
     expect(parseGitlabUrl('https://self.host/a/b')).toBeUndefined()
     expect(parseGitlabUrl('owner/repo#1')).toBeUndefined()
   })
+
+  it('reads a group\'s merge request list, top-level or nested, in either URL form', () => {
+    expect(parseGitlabUrl('https://self.host/team/-/merge_requests')).toEqual({ kind: 'gitlab-project', host: 'self.host', project: 'team' })
+    expect(parseGitlabUrl('https://self.host/groups/team/sub/-/merge_requests')).toEqual({ kind: 'gitlab-project', host: 'self.host', project: 'team/sub' })
+    expect(parseGitlabUrl('https://self.host/team/-/issues')).toBeUndefined()
+  })
 })

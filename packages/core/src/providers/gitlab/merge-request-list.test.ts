@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { staticCredentials } from '../../types/source'
 import { createGitlabClient } from './client'
-import { fetchOpenMergeRequests } from './merge-request-list'
+import { fetchOpenMergeRequests, resolveGitlabNamespace } from './merge-request-list'
 
 const mr = {
   iid: 7,
@@ -53,5 +53,32 @@ describe('fetchOpenMergeRequests', () => {
   it('ends on the last page, and estimates the total when GitLab omits it', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json([mr], { headers: { 'x-next-page': '' } })))
     expect(await fetchOpenMergeRequests(createGitlabClient('self.host'), 'g/p', '3')).toMatchObject({ next: undefined, totalCount: 201 })
+  })
+})
+
+describe('group merge request lists', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('lists a group\'s merge requests, each naming its own project', async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => Response.json([{ ...mr, references: { full: 'team/sub/svc!7' } }], { headers: { 'x-total': '1' } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const page = await fetchOpenMergeRequests(createGitlabClient('self.host'), 'team', undefined, 'group')
+
+    expect(new URL(fetchMock.mock.calls[0]![0]).pathname).toBe('/api/v4/groups/team/merge_requests')
+    expect(page.items[0]).toMatchObject({ number: 7, repository: 'team/sub/svc' })
+  })
+
+  it('leaves a project\'s items without a repository', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json([{ ...mr, references: { full: 'g/p!7' } }])))
+    expect((await fetchOpenMergeRequests(createGitlabClient('self.host'), 'g/p')).items[0]!.repository).toBeUndefined()
+  })
+
+  it('tells a project from a group by whether GitLab finds a project there', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => new URL(url).pathname === '/api/v4/projects/g%2Fp' ? Response.json({}) : Response.json({ message: '404 Project Not Found' }, { status: 404 })))
+    expect(await resolveGitlabNamespace(createGitlabClient('self.host'), 'g/p')).toBe('project')
+    expect(await resolveGitlabNamespace(createGitlabClient('self.host'), 'team')).toBe('group')
   })
 })
