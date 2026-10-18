@@ -62,3 +62,11 @@ export function needsFullFileToHighlight(file: FileChange): boolean {
     return false
   return file.hunks.some(hunk => hunk.oldStart > 1 || hunk.newStart > 1)
 }
+
+/** Added and removed lines of a built diff - the counts a truncated file's patch couldn't carry. */
+export function changeCounts(diff: FileDiffMetadata): { additions: number, deletions: number } {
+  return diff.hunks.reduce(
+    (sum, hunk) => ({ additions: sum.additions + hunk.additionLines, deletions: sum.deletions + hunk.deletionLines }),
+    { additions: 0, deletions: 0 },
+  )
+}

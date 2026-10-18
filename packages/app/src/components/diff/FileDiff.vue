@@ -19,7 +19,7 @@ import CriticalMark from './CriticalMark.vue'
 import { diffVirtualizerKey } from './diff-virtualizer'
 import DiffStats from './DiffStats.vue'
 import { fileCollapseKey } from './file-collapse'
-import { buildFileDiff, needsFullFileToHighlight } from './file-diff-input'
+import { buildFileDiff, changeCounts, needsFullFileToHighlight } from './file-diff-input'
 import FileStatus from './FileStatus.vue'
 import { fileIsCritical } from './group-utils'
 import { isNoisyFile } from './noisy-files'
@@ -273,7 +273,13 @@ const MIN_SPLIT_WIDTH_PX = 640
 // Forces `unified` regardless of the user's global layout preference when a split view
 // wouldn't fit (container too narrow for two columns) or wouldn't show anything useful
 // (a file that's purely additions or purely deletions has nothing on the other side).
-const isOneSided = computed(() => props.file.additions === 0 || props.file.deletions === 0)
+// A truncated file's counts are unknown (both 0) until its content loads; then the built diff has them.
+const isOneSided = computed(() => {
+  const counts = props.file.truncated
+    ? fileDiff.value && fullFileLoaded.value ? changeCounts(fileDiff.value) : undefined
+    : props.file
+  return !!counts && (counts.additions === 0 || counts.deletions === 0)
+})
 const effectiveLayout = computed<'split' | 'unified'>(() => {
   if (props.store.ui.layout === 'unified' || isOneSided.value)
     return 'unified'
