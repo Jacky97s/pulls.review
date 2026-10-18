@@ -312,6 +312,8 @@
     "requestChanges": "要求修改",
     "discard": "放棄審查",
     "leaveComment": "留下留言",
+    "lines": "第 {start}–{end} 行",
+    "commentOnLines": "留言於第 {start}–{end} 行",
     "addSingle": "新增單則留言",
     "addToReview": "新增審查留言",
     "startReview": "開始審查",

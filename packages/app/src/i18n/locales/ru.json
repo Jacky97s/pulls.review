@@ -312,6 +312,8 @@
     "requestChanges": "Запросить изменения",
     "discard": "Отменить ревью",
     "leaveComment": "Оставьте комментарий",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Добавить одиночный комментарий",
     "addToReview": "Добавить комментарий ревью",
     "startReview": "Начать ревью",

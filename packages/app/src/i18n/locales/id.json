@@ -312,6 +312,8 @@
     "requestChanges": "Minta perubahan",
     "discard": "Buang tinjauan",
     "leaveComment": "Tulis komentar",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Tambah satu komentar",
     "addToReview": "Tambah komentar tinjauan",
     "startReview": "Mulai tinjauan",

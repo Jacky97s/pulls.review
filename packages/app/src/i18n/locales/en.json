@@ -313,6 +313,8 @@
     "ownPrCommentOnly": "You cannot approve or request changes on your own pull requests.",
     "discard": "Discard review",
     "leaveComment": "Leave a comment",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Add single comment",
     "addToReview": "Add review comment",
     "startReview": "Start a review",

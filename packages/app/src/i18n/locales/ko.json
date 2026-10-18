@@ -312,6 +312,8 @@
     "requestChanges": "변경 요청",
     "discard": "리뷰 버리기",
     "leaveComment": "댓글 남기기",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "단일 댓글 추가",
     "addToReview": "리뷰 댓글 추가",
     "startReview": "리뷰 시작",

@@ -312,6 +312,8 @@
     "requestChanges": "変更をリクエスト",
     "discard": "レビューを破棄",
     "leaveComment": "コメントを書く",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "単独コメントを追加",
     "addToReview": "レビューコメントを追加",
     "startReview": "レビューを開始",

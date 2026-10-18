@@ -312,6 +312,8 @@
     "requestChanges": "Solicitar cambios",
     "discard": "Descartar revisión",
     "leaveComment": "Deja un comentario",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Añadir comentario único",
     "addToReview": "Añadir comentario de revisión",
     "startReview": "Iniciar una revisión",

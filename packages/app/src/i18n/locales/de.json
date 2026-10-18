@@ -312,6 +312,8 @@
     "requestChanges": "Änderungen anfordern",
     "discard": "Review verwerfen",
     "leaveComment": "Kommentar hinterlassen",
+    "lines": "Lines {start}–{end}",
+    "commentOnLines": "Comment on lines {start}–{end}",
     "addSingle": "Einzelnen Kommentar hinzufügen",
     "addToReview": "Review-Kommentar hinzufügen",
     "startReview": "Review beginnen",

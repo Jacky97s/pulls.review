@@ -238,6 +238,17 @@ function openDraft(range: SelectedLineRange) {
   draftError.value = undefined
 }
 
+/** Highlights a range thread's lines while the pointer is on it; the open draft's own selection comes back after. */
+function highlightThread(thread: CommentThread, range: { start: number, end: number } | undefined) {
+  const draft = draftTarget.value
+  if (range)
+    instance?.setSelectedLines({ start: range.start, end: range.end, side: thread.startSide ?? thread.side, endSide: thread.side })
+  else if (draft?.startLine !== undefined)
+    instance?.setSelectedLines({ start: draft.startLine, end: draft.line, side: draft.startSide ?? draft.side, endSide: draft.side })
+  else
+    instance?.setSelectedLines(null)
+}
+
 async function submitDraft(body: string, mode: 'single' | 'review') {
   const target = draftTarget.value
   const r = reviews.value
@@ -462,10 +473,12 @@ defineExpose({
           :key="thread.rootId"
           :thread="thread"
           :reviews="store.reviews!"
+          @highlight="highlightThread(thread, $event)"
         />
         <div v-if="group.hasDraft" class="my-1 max-w-200 overflow-hidden border border-base rounded-lg bg-base">
           <CommentComposer
             :has-pending-review="!!store.reviews!.pendingReview"
+            :range="draftTarget?.startLine !== undefined ? { start: draftTarget.startLine, end: draftTarget.line } : undefined"
             :busy="draftBusy"
             :error="draftError"
             @submit="submitDraft"
