@@ -13,6 +13,18 @@ let cache: CacheRepositories
 
 const mocks = vi.hoisted(() => ({
   fetchOpenPullRequests: vi.fn(),
+  fetchMergeRequests: vi.fn(),
+  fetchGitlabUsername: vi.fn(),
+  fetchGitlabLabelNames: vi.fn(),
+  resolveGitlabNamespace: vi.fn(),
+}))
+
+vi.mock('@pulls.review/core/gitlab', async importOriginal => ({
+  ...await importOriginal<typeof import('@pulls.review/core/gitlab')>(),
+  fetchMergeRequests: mocks.fetchMergeRequests,
+  fetchGitlabUsername: mocks.fetchGitlabUsername,
+  fetchGitlabLabelNames: mocks.fetchGitlabLabelNames,
+  resolveGitlabNamespace: mocks.resolveGitlabNamespace,
 }))
 
 vi.mock('@pulls.review/core/github', async importOriginal => ({
@@ -66,7 +78,10 @@ function viewedEntry(key: string, analyzedBy: PrCacheEntry['analyzedBy'] = {}): 
 beforeEach(() => {
   storage = createStorage({ driver: memoryDriver() })
   cache = createCacheRepositories(storage)
-  mocks.fetchOpenPullRequests.mockReset()
+  for (const mock of Object.values(mocks))
+    mock.mockReset()
+  mocks.resolveGitlabNamespace.mockResolvedValue('project')
+  mocks.fetchGitlabLabelNames.mockResolvedValue(['bug'])
 })
 
 describe('createPullRequestListStore', () => {
@@ -166,5 +181,51 @@ describe('createPullRequestListStore', () => {
 
     expect(store.items.map(pr => pr.number)).toEqual([3, 2])
     expect(store.hasMore).toBe(false)
+  })
+})
+
+describe('a GitLab list store', () => {
+  const repository = { host: 'self.host', project: 'g/p' }
+
+  it('starts from the given filters, resolves the username once, and refetches the first page when they change', async () => {
+    mocks.fetchGitlabUsername.mockResolvedValue('alice')
+    mocks.fetchMergeRequests.mockResolvedValueOnce(page([1], 1)).mockResolvedValueOnce(page([9], 1)).mockResolvedValueOnce(page([8], 1))
+    const store = createPullRequestListStore(repository, { cache, credentials: staticCredentials(), filters: { state: 'opened', mine: 'author', labels: [], draft: 'any' } })
+    await store.load()
+
+    expect(mocks.fetchMergeRequests.mock.calls[0]![2]).toMatchObject({ filters: { mine: 'author' }, username: 'alice', kind: 'project' })
+    expect(store.labelOptions).toEqual(['bug'])
+
+    await store.setFilters({ state: 'merged', mine: 'reviewer', labels: ['bug'], draft: 'hide', targetBranch: 'main' })
+    await store.setFilters({ state: 'all', labels: [], draft: 'any' })
+
+    expect(mocks.fetchMergeRequests.mock.calls[1]![2]).toMatchObject({ filters: { state: 'merged', mine: 'reviewer' }, username: 'alice', next: undefined })
+    expect(mocks.fetchMergeRequests.mock.calls[2]![2]).toMatchObject({ filters: { state: 'all' }, username: undefined })
+    expect(mocks.fetchGitlabUsername).toHaveBeenCalledOnce()
+    expect(store.items.map(pr => pr.number)).toEqual([8])
+    expect(store.filters).toMatchObject({ state: 'all' })
+  })
+
+  it('never lets a slower response for the previous filters overwrite the new list', async () => {
+    const stale = Promise.withResolvers<PullRequestListPage>()
+    mocks.fetchMergeRequests.mockReturnValueOnce(stale.promise).mockResolvedValueOnce(page([2], 1))
+    const store = createPullRequestListStore(repository, { cache, credentials: staticCredentials() })
+
+    const first = store.load()
+    await vi.waitFor(() => expect(mocks.fetchMergeRequests).toHaveBeenCalledOnce())
+    await store.setFilters({ state: 'closed', labels: [], draft: 'any' })
+    stale.resolve(page([1], 1))
+    await first
+
+    expect(store.items.map(pr => pr.number)).toEqual([2])
+    expect(store.isLoading).toBe(false)
+  })
+
+  it('has no filters on a GitHub list', async () => {
+    mocks.fetchOpenPullRequests.mockResolvedValue(page([1], 1))
+    const store = createPullRequestListStore({ owner: 'o', repo: 'r' }, { cache, credentials: staticCredentials() })
+    await store.load()
+    expect(store.filters).toBeUndefined()
+    expect(mocks.fetchGitlabLabelNames).not.toHaveBeenCalled()
   })
 })
