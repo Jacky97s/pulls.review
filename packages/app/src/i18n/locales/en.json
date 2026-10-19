@@ -150,6 +150,39 @@
     "groups": "{n} group | {n} groups",
     "viewedHint": "Viewed in this browser",
     "aiAvailable": "AI analysis available",
+    "count": {
+      "opened": "{n} open",
+      "merged": "{n} merged",
+      "closed": "{n} closed",
+      "all": "{n} total"
+    },
+    "emptyFiltered": "No merge requests match these filters",
+    "filters": {
+      "stateLabel": "Merge request state",
+      "mineLabel": "Related to me",
+      "draftLabel": "Draft merge requests",
+      "targetBranch": "Target branch",
+      "addLabel": "Add label…",
+      "noLabels": "No labels found",
+      "removeLabel": "Remove label {label}",
+      "state": {
+        "opened": "Open",
+        "merged": "Merged",
+        "closed": "Closed",
+        "all": "All"
+      },
+      "mine": {
+        "none": "Anyone",
+        "author": "Authored by me",
+        "assignee": "Assigned to me",
+        "reviewer": "Review requested of me"
+      },
+      "draft": {
+        "any": "Drafts and ready",
+        "only": "Drafts only",
+        "hide": "Hide drafts"
+      }
+    },
     "sort": {
       "label": "Sort",
       "recently-updated": "Recently updated",

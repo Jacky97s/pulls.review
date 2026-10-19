@@ -150,6 +150,39 @@
     "groups": "{n} grupo | {n} grupos",
     "viewedHint": "Visto neste navegador",
     "aiAvailable": "Análise de IA disponível",
+    "count": {
+      "opened": "{n} abertas",
+      "merged": "{n} mescladas",
+      "closed": "{n} fechadas",
+      "all": "{n} no total"
+    },
+    "emptyFiltered": "Nenhum merge request corresponde a esses filtros",
+    "filters": {
+      "stateLabel": "Estado do merge request",
+      "mineLabel": "Relacionados a mim",
+      "draftLabel": "Merge requests em rascunho",
+      "targetBranch": "Branch de destino",
+      "addLabel": "Adicionar etiqueta…",
+      "noLabels": "Nenhuma etiqueta encontrada",
+      "removeLabel": "Remover a etiqueta {label}",
+      "state": {
+        "opened": "Abertos",
+        "merged": "Mesclados",
+        "closed": "Fechados",
+        "all": "Todos"
+      },
+      "mine": {
+        "none": "Qualquer um",
+        "author": "Criados por mim",
+        "assignee": "Atribuídos a mim",
+        "reviewer": "Com revisão pedida a mim"
+      },
+      "draft": {
+        "any": "Rascunhos e prontos",
+        "only": "Somente rascunhos",
+        "hide": "Ocultar rascunhos"
+      }
+    },
     "sort": {
       "label": "Ordenar",
       "recently-updated": "Atualizados recentemente",

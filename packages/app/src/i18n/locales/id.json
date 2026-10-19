@@ -150,6 +150,39 @@
     "groups": "{n} grup | {n} grup",
     "viewedHint": "Dilihat di browser ini",
     "aiAvailable": "Analisis AI tersedia",
+    "count": {
+      "opened": "{n} terbuka",
+      "merged": "{n} digabung",
+      "closed": "{n} ditutup",
+      "all": "{n} total"
+    },
+    "emptyFiltered": "Tidak ada merge request yang cocok dengan filter ini",
+    "filters": {
+      "stateLabel": "Status merge request",
+      "mineLabel": "Terkait saya",
+      "draftLabel": "Merge request draf",
+      "targetBranch": "Branch target",
+      "addLabel": "Tambah label…",
+      "noLabels": "Label tidak ditemukan",
+      "removeLabel": "Hapus label {label}",
+      "state": {
+        "opened": "Terbuka",
+        "merged": "Digabung",
+        "closed": "Ditutup",
+        "all": "Semua"
+      },
+      "mine": {
+        "none": "Siapa saja",
+        "author": "Dibuat oleh saya",
+        "assignee": "Ditugaskan ke saya",
+        "reviewer": "Meminta review dari saya"
+      },
+      "draft": {
+        "any": "Draf dan siap",
+        "only": "Hanya draf",
+        "hide": "Sembunyikan draf"
+      }
+    },
     "sort": {
       "label": "Urutkan",
       "recently-updated": "Baru diperbarui",

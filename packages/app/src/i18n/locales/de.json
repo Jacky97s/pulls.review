@@ -150,6 +150,39 @@
     "groups": "{n} Gruppe | {n} Gruppen",
     "viewedHint": "In diesem Browser angesehen",
     "aiAvailable": "KI-Analyse verfügbar",
+    "count": {
+      "opened": "{n} offen",
+      "merged": "{n} gemergt",
+      "closed": "{n} geschlossen",
+      "all": "{n} insgesamt"
+    },
+    "emptyFiltered": "Keine Merge Requests passen zu diesen Filtern",
+    "filters": {
+      "stateLabel": "Status des Merge Requests",
+      "mineLabel": "Mit mir verbunden",
+      "draftLabel": "Entwurf-Merge-Requests",
+      "targetBranch": "Zielbranch",
+      "addLabel": "Label hinzufügen…",
+      "noLabels": "Keine Labels gefunden",
+      "removeLabel": "Label {label} entfernen",
+      "state": {
+        "opened": "Offen",
+        "merged": "Gemergt",
+        "closed": "Geschlossen",
+        "all": "Alle"
+      },
+      "mine": {
+        "none": "Alle",
+        "author": "Von mir erstellt",
+        "assignee": "Mir zugewiesen",
+        "reviewer": "Review von mir angefragt"
+      },
+      "draft": {
+        "any": "Entwürfe und fertige",
+        "only": "Nur Entwürfe",
+        "hide": "Entwürfe ausblenden"
+      }
+    },
     "sort": {
       "label": "Sortieren",
       "recently-updated": "Zuletzt aktualisiert",

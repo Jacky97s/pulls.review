@@ -150,6 +150,39 @@
     "groups": "{n} 個分組",
     "viewedHint": "已在此瀏覽器中查看",
     "aiAvailable": "有 AI 分析",
+    "count": {
+      "opened": "{n} 個開放",
+      "merged": "{n} 個已合併",
+      "closed": "{n} 個已關閉",
+      "all": "共 {n} 個"
+    },
+    "emptyFiltered": "沒有符合這些篩選條件的合併請求",
+    "filters": {
+      "stateLabel": "合併請求狀態",
+      "mineLabel": "與我相關",
+      "draftLabel": "草稿合併請求",
+      "targetBranch": "目標分支",
+      "addLabel": "新增標籤…",
+      "noLabels": "找不到標籤",
+      "removeLabel": "移除標籤 {label}",
+      "state": {
+        "opened": "開放",
+        "merged": "已合併",
+        "closed": "已關閉",
+        "all": "全部"
+      },
+      "mine": {
+        "none": "不限",
+        "author": "我建立的",
+        "assignee": "指派給我的",
+        "reviewer": "需要我審查的"
+      },
+      "draft": {
+        "any": "草稿與正式",
+        "only": "僅草稿",
+        "hide": "隱藏草稿"
+      }
+    },
     "sort": {
       "label": "排序",
       "recently-updated": "最近更新",
