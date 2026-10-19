@@ -17,7 +17,7 @@ const store = createPullRequestListStore({ host, project }, { ...useAppContext()
 // The filters live in the URL so a filtered list can be shared or reloaded.
 watch(() => store.filters, (filters) => {
   if (filters)
-    router.replace({ query: serializeFilters(filters) })
+    router.replace({ path: route.path, query: serializeFilters(filters) })
 })
 
 useDocumentTitle(() => project)
