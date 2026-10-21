@@ -3,6 +3,7 @@ node_modules
 *.log
 dist
 .env
+.local-certs/
 .idea/
 packages/app/public/assets/fonts
 packages/app/public/embed

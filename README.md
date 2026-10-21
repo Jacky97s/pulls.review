@@ -125,6 +125,28 @@ docker compose up -d --build
 - Without it, users paste a personal access token per instance in Settings → GitLab.
 - The browser calls each GitLab instance directly, so the instance must allow CORS from this site (GitLab's API does by default).
 
+### HTTPS on a local network
+
+The optional `nginx-https` Compose profile terminates TLS in front of the site container. For a private IP, create a locally trusted certificate with [mkcert](https://github.com/FiloSottile/mkcert):
+
+```bash
+brew install mkcert
+mkcert -install
+mkdir -p .local-certs
+mkcert -cert-file .local-certs/pulls-review.crt -key-file .local-certs/pulls-review.key 10.0.0.89
+```
+
+Add these entries to `.env`, choosing a free HTTP port if `7654` is already used:
+
+```dotenv
+PORT=8081
+HTTPS_PORT=7654
+TLS_CERT_FILE=./.local-certs/pulls-review.crt
+TLS_KEY_FILE=./.local-certs/pulls-review.key
+```
+
+Start both containers with `docker compose --profile https up -d --build`, then open `https://10.0.0.89:7654`. The GitLab Application's redirect URI must be `https://10.0.0.89:7654/oauth/gitlab`. For access from another device, install and trust the `rootCA.pem` from `mkcert -CAROOT` on that device too; never copy `rootCA-key.pem`. For a public domain, use a trusted certificate for that domain instead of a local CA.
+
 To analyze every GitLab merge request in CI, build the CLI image (`docker build --target actions -t <registry>/pulls-review-actions .`), push it to a registry the runners can pull from, and include [`deploy/pulls-review.gitlab-ci.yml`](./deploy/pulls-review.gitlab-ci.yml) - its header lists the CI/CD variables it needs.
 
 ## Packages

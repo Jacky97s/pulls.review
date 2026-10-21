@@ -12,3 +12,17 @@ services:
     ports:
       - '${PORT:-8080}:80'
     restart: unless-stopped
+
+  nginx-https:
+    image: nginx:1.29-alpine
+    profiles:
+      - https
+    depends_on:
+      - pulls-review
+    ports:
+      - '${HTTPS_PORT:-8443}:443'
+    volumes:
+      - ./deploy/nginx-https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${TLS_CERT_FILE:-./.local-certs/pulls-review.crt}:/etc/nginx/certs/tls.crt:ro
+      - ${TLS_KEY_FILE:-./.local-certs/pulls-review.key}:/etc/nginx/certs/tls.key:ro
+    restart: unless-stopped
