@@ -112,7 +112,6 @@
     "newCommits": "自快取以來，此 pull request 有新的提交。",
     "autoRefreshNextTime": "下次自動重新整理",
     "endOfDiff": "你已到達 diff 結尾。",
-    "analyzeBy": "分析方式",
     "rules": "規則",
     "ai": "AI",
     "by": "作者",
@@ -321,7 +320,8 @@
     "editComment": "編輯留言",
     "deleteComment": "刪除留言",
     "replyPlaceholder": "回覆…",
-    "resolve": "標記為已解決"
+    "resolve": "標記為已解決",
+    "ownPrCommentOnly": "你不能核准自己的拉取請求，也不能對其請求變更。"
   },
   "chat": {
     "title": "詢問此 PR",
@@ -334,7 +334,9 @@
     "updatingGrouping": "正在更新分組…",
     "submittingGrouping": "正在送出分組…",
     "requestFailed": "請求失敗",
-    "stopped": "已停止"
+    "stopped": "已停止",
+    "askAboutSelection": "詢問 AI",
+    "removeQuote": "移除"
   },
   "settings": {
     "layout": "Diff 版面",
@@ -409,7 +411,7 @@
       "agentNeedsCli": "本機代理在 pulls.review CLI 中執行：在儲存庫中執行 `npx pulls.review`，然後在那裡選擇。",
       "agentDetecting": "正在尋找代理 CLI…",
       "agentNone": "在此機器上找不到代理 CLI。",
-      "agentHint": "安裝在此機器上並以自己的帳號登入的編碼代理：{claude}, {codex} 或 {opencode}。它只讀取補丁和儲存庫，不會寫入。",
+      "agentHint": "安裝在此機器上並以自己的帳號登入的編碼代理：{claude}, {codex}, {opencode} 或 {pi}。它只讀取補丁和儲存庫，不會寫入。",
       "agentPick": "選擇代理…"
     },
     "models": {

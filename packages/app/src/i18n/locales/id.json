@@ -112,7 +112,6 @@
     "newCommits": "Pull request ini memiliki commit baru sejak disimpan di cache.",
     "autoRefreshNextTime": "Muat ulang otomatis lain kali",
     "endOfDiff": "Anda telah mencapai akhir diff.",
-    "analyzeBy": "Analisis dengan",
     "rules": "Aturan",
     "ai": "AI",
     "by": "oleh",
@@ -321,7 +320,8 @@
     "editComment": "Edit komentar",
     "deleteComment": "Hapus komentar",
     "replyPlaceholder": "Balas…",
-    "resolve": "Selesaikan"
+    "resolve": "Selesaikan",
+    "ownPrCommentOnly": "Anda tidak dapat menyetujui atau meminta perubahan pada pull request Anda sendiri."
   },
   "chat": {
     "title": "Tanya tentang PR ini",
@@ -334,7 +334,9 @@
     "updatingGrouping": "Memperbarui pengelompokan…",
     "submittingGrouping": "Mengirim pengelompokan…",
     "requestFailed": "Permintaan gagal",
-    "stopped": "dihentikan"
+    "stopped": "dihentikan",
+    "askAboutSelection": "Tanya AI",
+    "removeQuote": "Hapus"
   },
   "settings": {
     "layout": "Tata letak diff",
@@ -409,7 +411,7 @@
       "agentNeedsCli": "Agen lokal berjalan di CLI pulls.review: jalankan di sebuah repositori dengan `npx pulls.review` dan pilih di sana.",
       "agentDetecting": "Mencari CLI agen…",
       "agentNone": "Tidak ada CLI agen ditemukan di mesin ini.",
-      "agentHint": "Agen pengkodean yang terpasang di mesin ini, masuk dengan akunnya sendiri: {claude}, {codex} atau {opencode}. Ia membaca patch dan repositori, tidak pernah menulis.",
+      "agentHint": "Agen pengkodean yang terpasang di mesin ini, masuk dengan akunnya sendiri: {claude}, {codex}, {opencode}, atau {pi}. Ia membaca patch dan repositori, tidak pernah menulis.",
       "agentPick": "Pilih agen…"
     },
     "models": {

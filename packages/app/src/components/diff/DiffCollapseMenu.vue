@@ -5,6 +5,7 @@ import ActionIconButton from '@antfu/design/components/Action/ActionIconButton.v
 import OverlayDropdownItem from '@antfu/design/components/Overlay/OverlayDropdownItem.vue'
 import { DropdownMenuContent, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui'
 import { computed, inject, ref, useTemplateRef } from 'vue'
+import { t } from '../../i18n'
 import { fileCollapseKey } from './file-collapse'
 import { reviewStatus } from './review-status'
 import { isTestFile } from './test-files'
@@ -29,10 +30,10 @@ const collisionBoundary = computed(() => {
 })
 
 const actions = [
-  { label: 'file.expandAll', icon: 'i-ph:arrows-out-line-vertical-duotone', collapse: false, applies: () => true },
-  { label: 'file.collapseAll', icon: 'i-ph:arrows-in-line-vertical-duotone', collapse: true, applies: () => true },
-  { label: 'file.collapseReviewed', icon: 'i-ph:check-square-duotone', collapse: true, applies: (file: FileChange) => reviewStatus(props.store, file) === 'reviewed' },
-  { label: 'file.collapseTests', icon: 'i-ph:flask-duotone', collapse: true, applies: (file: FileChange) => isTestFile(file.path) },
+  { label: () => t('file.expandAll'), icon: 'i-ph:arrows-out-line-vertical-duotone', collapse: false, applies: () => true },
+  { label: () => t('file.collapseAll'), icon: 'i-ph:arrows-in-line-vertical-duotone', collapse: true, applies: () => true },
+  { label: () => t('file.collapseReviewed'), icon: 'i-ph:check-square-duotone', collapse: true, applies: (file: FileChange) => reviewStatus(props.store, file) === 'reviewed' },
+  { label: () => t('file.collapseTests'), icon: 'i-ph:flask-duotone', collapse: true, applies: (file: FileChange) => isTestFile(file.path) },
 ] as const
 
 function run(action: typeof actions[number]) {
@@ -65,11 +66,11 @@ function run(action: typeof actions[number]) {
       >
         <OverlayDropdownItem
           v-for="action in actions"
-          :key="action.label"
+          :key="action.icon"
           :icon="action.icon"
           @select="run(action)"
         >
-          {{ $t(action.label) }}
+          {{ action.label() }}
         </OverlayDropdownItem>
       </DropdownMenuContent>
     </DropdownMenuRoot>

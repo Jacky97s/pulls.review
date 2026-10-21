@@ -112,7 +112,6 @@
     "newCommits": "캐시 이후 이 pull request에 새 커밋이 있습니다.",
     "autoRefreshNextTime": "다음부터 자동 새로 고침",
     "endOfDiff": "diff의 끝에 도달했습니다.",
-    "analyzeBy": "분석 방식",
     "rules": "규칙",
     "ai": "AI",
     "by": "작성자",
@@ -321,7 +320,8 @@
     "editComment": "댓글 편집",
     "deleteComment": "댓글 삭제",
     "replyPlaceholder": "답글…",
-    "resolve": "해결됨으로 표시"
+    "resolve": "해결됨으로 표시",
+    "ownPrCommentOnly": "본인의 풀 리퀘스트는 승인하거나 변경을 요청할 수 없습니다."
   },
   "chat": {
     "title": "이 PR에 대해 질문",
@@ -334,7 +334,9 @@
     "updatingGrouping": "그룹 업데이트 중…",
     "submittingGrouping": "그룹 제출 중…",
     "requestFailed": "요청 실패",
-    "stopped": "중지됨"
+    "stopped": "중지됨",
+    "askAboutSelection": "AI에게 질문",
+    "removeQuote": "제거"
   },
   "settings": {
     "layout": "Diff 레이아웃",
@@ -409,7 +411,7 @@
       "agentNeedsCli": "로컬 에이전트는 pulls.review CLI에서 실행됩니다. 저장소에서 `npx pulls.review`를 실행하고 거기서 선택하세요.",
       "agentDetecting": "에이전트 CLI 찾는 중…",
       "agentNone": "이 컴퓨터에서 에이전트 CLI를 찾을 수 없습니다.",
-      "agentHint": "이 컴퓨터에 설치되어 자체 계정으로 로그인된 코딩 에이전트({claude}, {codex} 또는 {opencode})입니다. 패치와 저장소를 읽기만 하고 쓰지 않습니다.",
+      "agentHint": "이 컴퓨터에 설치되어 자체 계정으로 로그인된 코딩 에이전트({claude}, {codex}, {opencode} 또는 {pi})입니다. 패치와 저장소를 읽기만 하고 쓰지 않습니다.",
       "agentPick": "에이전트 선택…"
     },
     "models": {

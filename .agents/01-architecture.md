@@ -183,6 +183,11 @@ analysis strategy later never touches the view layer:
     result replaces the session; a refetch keeps it (the transcript still
     reads the live diff). Results cached without one show `Re-analyze to
     enable chat`.
+  - Asking about selected lines is a UI concern only: a line selection in a
+    file's diff becomes a quote (`components/chat/chat-quotes.ts`, a labelled
+    unified-diff excerpt) that the chat widget holds until the next message
+    and prepends to its text. The runner and the transcript only ever see a
+    plain user message.
   - `web-llm` — TODO, stub only. Fully in-browser model inference, no network
     call at analyze time.
   - LLM-sourced groups MAY nest one level (root group -> children, e.g.
@@ -234,8 +239,10 @@ repos read one. Contract:
 - Loading writes the result into the cached diff under its own `source` with
   `sharedBy: login`, so the view credits it and never offers to re-share it.
   Discovery is one best-effort `GET` of the first 100 comments, run only when
-  the store has no AI result. `?from=` on the site loads that user directly
-  unless it would replace a locally generated result (then it's offered).
+  the store has no AI result. `?from=` on the site - which the CLI's
+  `--from <login>` adds to a pull request page - loads that user directly,
+  replacing an older shared result, unless it would replace a locally
+  generated result (then it's offered).
 - A shared result whose `headSha` differs from the loaded diff is offered
   labelled outdated, not hidden. Likewise one whose `locale` differs from the
   UI language is offered labelled with that language (results from before the

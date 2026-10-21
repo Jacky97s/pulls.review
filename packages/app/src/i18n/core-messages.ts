@@ -3,21 +3,21 @@ import { Diagnostic } from 'nostics'
 import { t } from './index'
 
 /** Core diagnostics the UI has a translation for, by code. */
-const DIAGNOSTIC_KEYS = {
-  llmNotConfigured: 'analyze.notConfigured',
-  agentSessionLost: 'analyze.agentSessionLost',
-  tokenRejected: 'errors.tokenRejected',
-  commentTooLarge: 'errors.tooLarge',
+const DIAGNOSTIC_MESSAGES = {
+  llmNotConfigured: (data: Record<string, unknown>) => t('analyze.notConfigured', data),
+  agentSessionLost: (data: Record<string, unknown>) => t('analyze.agentSessionLost', data),
+  tokenRejected: (data: Record<string, unknown>) => t('errors.tokenRejected', data),
+  commentTooLarge: (data: Record<string, unknown>) => t('errors.tooLarge', data),
 } as const
 
-function isTranslated(name: string): name is keyof typeof DIAGNOSTIC_KEYS {
-  return name in DIAGNOSTIC_KEYS
+function isTranslated(name: string): name is keyof typeof DIAGNOSTIC_MESSAGES {
+  return name in DIAGNOSTIC_MESSAGES
 }
 
 /** The error to show for anything core threw: a translated diagnostic where one exists, the message otherwise. */
 export function localizeError(error: unknown): Error {
   if (error instanceof Diagnostic && isTranslated(error.name))
-    return new Error(t(DIAGNOSTIC_KEYS[error.name], error.data ?? {}))
+    return new Error(DIAGNOSTIC_MESSAGES[error.name](error.data ?? {}))
   return error instanceof Error ? error : new Error(String(error))
 }
 

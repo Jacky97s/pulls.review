@@ -112,7 +112,6 @@
     "newCommits": "Questa pull request ha nuovi commit da quando è stata memorizzata in cache.",
     "autoRefreshNextTime": "Aggiorna automaticamente la prossima volta",
     "endOfDiff": "Hai raggiunto la fine del diff.",
-    "analyzeBy": "Analizza con",
     "rules": "Regole",
     "ai": "IA",
     "by": "di",
@@ -321,7 +320,8 @@
     "editComment": "Modifica commento",
     "deleteComment": "Elimina commento",
     "replyPlaceholder": "Rispondi…",
-    "resolve": "Risolvi"
+    "resolve": "Risolvi",
+    "ownPrCommentOnly": "Non puoi approvare né richiedere modifiche sulle tue pull request."
   },
   "chat": {
     "title": "Chiedi su questa PR",
@@ -334,7 +334,9 @@
     "updatingGrouping": "Aggiornamento del raggruppamento…",
     "submittingGrouping": "Invio del raggruppamento…",
     "requestFailed": "Richiesta fallita",
-    "stopped": "fermato"
+    "stopped": "fermato",
+    "askAboutSelection": "Chiedi all'IA",
+    "removeQuote": "Rimuovi"
   },
   "settings": {
     "layout": "Layout del diff",
@@ -409,7 +411,7 @@
       "agentNeedsCli": "Gli agenti locali girano nella CLI di pulls.review: avviala in un repository con `npx pulls.review` e scegline uno lì.",
       "agentDetecting": "Ricerca delle CLI degli agenti…",
       "agentNone": "Nessuna CLI di agente trovata su questa macchina.",
-      "agentHint": "Un agente di codice installato su questa macchina, con il proprio account: {claude}, {codex} o {opencode}. Legge la patch e il repository, non scrive mai.",
+      "agentHint": "Un agente di codice installato su questa macchina, con il proprio account: {claude}, {codex}, {opencode} o {pi}. Legge la patch e il repository, non scrive mai.",
       "agentPick": "Scegli un agente…"
     },
     "models": {

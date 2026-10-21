@@ -8,11 +8,12 @@ import ActionIconButton from '@antfu/design/components/Action/ActionIconButton.v
 import DisplayFilePath from '@antfu/design/components/Display/DisplayFilePath.vue'
 import { FileDiff as PierreFileDiff, VirtualizedFileDiff } from '@pierre/diffs'
 import { useIntersectionObserver } from '@vueuse/core'
-import { computed, inject, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
 import { autoFetchFullFile } from '../../state/auto-fetch-full-file'
 import { isDark as globalIsDark, isDarkKey } from '../../state/dark'
 import { syntaxTheme } from '../../state/syntax-theme'
 import { wrapLines } from '../../state/wrap-lines'
+import { buildChatQuote, chatDraftKey } from '../chat/chat-quotes'
 import AnalysisNoteCard from './AnalysisNoteCard.vue'
 import CommentComposer from './CommentComposer.vue'
 import CriticalMark from './CriticalMark.vue'
@@ -268,6 +269,26 @@ async function submitDraft(body: string, mode: 'single' | 'review') {
   }
 }
 
+// --- Asking the chat about selected lines (`chatDraft` is absent outside `DiffsPage`) ---
+
+const chatDraft = inject(chatDraftKey, undefined)
+const canAsk = computed(() => !!chatDraft && !!props.store.aiResult && (props.store.llm?.chat.available ?? false) && !props.file.isBinary)
+const selectedRange = ref<SelectedLineRange>()
+const selectionQuote = computed(() => canAsk.value && selectedRange.value
+  ? buildChatQuote(props.file, selectedRange.value, { old: fullOldContent.value, new: fullNewContent.value })
+  : undefined)
+
+function askAboutSelection() {
+  const quote = selectionQuote.value
+  if (!chatDraft || !quote)
+    return
+  if (!chatDraft.quotes.some(other => other.label === quote.label))
+    chatDraft.quotes.push(quote)
+  chatDraft.open = true
+  instance?.setSelectedLines(null)
+  selectedRange.value = undefined
+}
+
 const MIN_SPLIT_WIDTH_PX = 640
 
 // Forces `unified` regardless of the user's global layout preference when a split view
@@ -302,8 +323,13 @@ const pierreOptions = computed((): FileDiffOptions<undefined, undefined> => ({
   ...(canComment.value
     ? {
         enableGutterUtility: true,
-        enableLineSelection: true,
         onGutterUtilityClick: openDraft,
+      }
+    : {}),
+  ...(canComment.value || canAsk.value
+    ? {
+        enableLineSelection: true,
+        onLineSelected: (range) => { selectedRange.value = range ?? undefined },
       }
     : {}),
 }))
@@ -315,6 +341,7 @@ function mount() {
   // (its default assumption is that it created the container itself) - the third
   // `isContainerManaged: true` constructor arg opts out of that.
   instance?.cleanUp()
+  selectedRange.value = undefined
 
   if (!containerRef.value || props.file.isBinary || collapsed.value || !fileDiff.value)
     return
@@ -386,6 +413,21 @@ watch(isReviewed, (value) => {
   collapsed.value = value
 })
 
+// Collapsing a file scrolled past its start drops the body the viewport sat in, so the
+// page would land several files further down. Pin its (non-sticky) start marker back
+// under the header instead, so the next file follows right below it.
+const headerRef = useTemplateRef<HTMLElement>('header')
+watch(collapsed, (value) => {
+  const root = headerRef.value?.getRootNode() as ParentNode | undefined
+  const marker = value ? root?.querySelector(`[data-file-start="${props.file.sha}"]`) : undefined
+  if (!marker)
+    return
+  const margin = Number.parseFloat(getComputedStyle(marker).scrollMarginTop) || 0
+  if (marker.getBoundingClientRect().top >= margin)
+    return
+  nextTick(() => marker.scrollIntoView({ behavior: 'instant', block: 'start' }))
+})
+
 defineExpose({
   /** Called by the file tree's "jump to file" navigation, which can't reach `collapsed` otherwise. */
   expand: () => { collapsed.value = false },
@@ -396,6 +438,7 @@ defineExpose({
   <div class="sticky top-[calc(var(--diffs-header-height)-1px)] z-file-diff-header mt-2 bg-base">
     <header
       :id="`file-${file.sha}`"
+      ref="header"
       class="relative flex items-center justify-between gap-2 overflow-hidden border border-base px-2 py-1.5"
       role="button"
       :class="[collapsed ? 'rounded-lg' : 'rounded-t-lg', isTest ? 'bg-green:8' : 'bg-base']"
@@ -412,6 +455,9 @@ defineExpose({
         <CriticalMark v-if="isCritical" />
       </div>
       <div class="flex shrink-0 items-center gap-2">
+        <ActionButton v-if="selectionQuote" size="sm" icon="i-ph:chat-circle-dots-duotone" class="my--1" @click="askAboutSelection">
+          {{ $t('chat.askAboutSelection') }}
+        </ActionButton>
         <span v-if="resolvedCount" class="text-xs op-fade">{{ $t('file.resolved', { n: resolvedCount }) }}</span>
         <DiffStats v-if="!file.isBinary" :additions="file.additions" :deletions="file.deletions" />
         <span v-else class="text-xs op-fade">{{ $t('file.binary') }}</span>

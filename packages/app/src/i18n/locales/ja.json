@@ -112,7 +112,6 @@
     "newCommits": "キャッシュ後にこの pull request に新しいコミットがあります。",
     "autoRefreshNextTime": "次回から自動更新",
     "endOfDiff": "diff の末尾に到達しました。",
-    "analyzeBy": "分析方法",
     "rules": "ルール",
     "ai": "AI",
     "by": "作成者",
@@ -321,7 +320,8 @@
     "editComment": "コメントを編集",
     "deleteComment": "コメントを削除",
     "replyPlaceholder": "返信…",
-    "resolve": "解決済みにする"
+    "resolve": "解決済みにする",
+    "ownPrCommentOnly": "自分のプルリクエストを承認したり、変更を依頼したりすることはできません。"
   },
   "chat": {
     "title": "この PR について質問",
@@ -334,7 +334,9 @@
     "updatingGrouping": "グループ分けを更新中…",
     "submittingGrouping": "グループ分けを送信中…",
     "requestFailed": "リクエストに失敗しました",
-    "stopped": "停止"
+    "stopped": "停止",
+    "askAboutSelection": "AI に質問",
+    "removeQuote": "削除"
   },
   "settings": {
     "layout": "diff レイアウト",
@@ -409,7 +411,7 @@
       "agentNeedsCli": "ローカルエージェントは pulls.review CLI で動作します。リポジトリ内で `npx pulls.review` を起動し、そこで選択してください。",
       "agentDetecting": "エージェント CLI を検索中…",
       "agentNone": "このマシンにエージェント CLI が見つかりません。",
-      "agentHint": "このマシンにインストールされ、自身のアカウントでサインイン済みのコーディングエージェント（{claude}, {codex} または {opencode}）。パッチとリポジトリを読むだけで、書き込みはしません。",
+      "agentHint": "このマシンにインストールされ、自身のアカウントでサインイン済みのコーディングエージェント（{claude}, {codex}, {opencode} または {pi}）。パッチとリポジトリを読むだけで、書き込みはしません。",
       "agentPick": "エージェントを選択…"
     },
     "models": {
