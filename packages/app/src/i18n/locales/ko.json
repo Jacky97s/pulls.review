@@ -149,6 +149,39 @@
     "groups": "{n}개 그룹",
     "viewedHint": "이 브라우저에서 본 PR",
     "aiAvailable": "AI 분석 있음",
+    "count": {
+      "opened": "{n}개 열림",
+      "merged": "{n}개 병합됨",
+      "closed": "{n}개 닫힘",
+      "all": "총 {n}개"
+    },
+    "emptyFiltered": "이 필터와 일치하는 머지 리퀘스트가 없습니다",
+    "filters": {
+      "stateLabel": "머지 리퀘스트 상태",
+      "mineLabel": "나와 관련",
+      "draftLabel": "초안 머지 리퀘스트",
+      "targetBranch": "대상 브랜치",
+      "addLabel": "라벨 추가…",
+      "noLabels": "라벨을 찾을 수 없습니다",
+      "removeLabel": "라벨 {label} 제거",
+      "state": {
+        "opened": "열림",
+        "merged": "병합됨",
+        "closed": "닫힘",
+        "all": "전체"
+      },
+      "mine": {
+        "none": "모두",
+        "author": "내가 작성",
+        "assignee": "나에게 할당",
+        "reviewer": "내게 리뷰 요청"
+      },
+      "draft": {
+        "any": "초안과 일반",
+        "only": "초안만",
+        "hide": "초안 숨기기"
+      }
+    },
     "sort": {
       "label": "정렬",
       "recently-updated": "최근 업데이트순",

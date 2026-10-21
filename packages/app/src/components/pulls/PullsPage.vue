@@ -6,6 +6,7 @@ import FeedbackEmptyState from '@antfu/design/components/Feedback/FeedbackEmptyS
 import FeedbackLoading from '@antfu/design/components/Feedback/FeedbackLoading.vue'
 import { useEventListener } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
+import { isDefaultFilters } from '../../stores/gitlab-list-filters'
 import GithubTokenRecovery from '../settings/GithubTokenRecovery.vue'
 import GitlabTokenSettings from '../settings/GitlabTokenSettings.vue'
 import { filterPullRequests } from './pull-request-list-query'
@@ -32,6 +33,7 @@ useEventListener(document, 'scroll', () => {
   scrollY.value = window.scrollY
 }, { capture: true })
 
+const isFiltered = computed(() => !!props.store.filters && !isDefaultFilters(props.store.filters))
 const hasItems = computed(() => props.store.items.length > 0)
 const matchCount = computed(() => filterPullRequests(props.store.items, query.value).length)
 const isSearching = computed(() => query.value.trim() !== '' && props.store.hasMore)
@@ -74,7 +76,7 @@ const isSearching = computed(() => query.value.trim() !== '' && props.store.hasM
           </div>
         </div>
         <div v-else class="px-4 py-12">
-          <FeedbackEmptyState icon="i-ph:git-pull-request-duotone" :title="$t('pulls.empty')" />
+          <FeedbackEmptyState icon="i-ph:git-pull-request-duotone" :title="$t(isFiltered ? 'pulls.emptyFiltered' : 'pulls.empty')" />
         </div>
 
         <div class="flex flex-col items-center gap-2 px-4 py-4 text-sm op-fade">

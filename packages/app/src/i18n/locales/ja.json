@@ -149,6 +149,39 @@
     "groups": "{n} グループ",
     "viewedHint": "このブラウザで閲覧済み",
     "aiAvailable": "AI 分析あり",
+    "count": {
+      "opened": "{n} 件オープン",
+      "merged": "{n} 件マージ済み",
+      "closed": "{n} 件クローズ",
+      "all": "合計 {n} 件"
+    },
+    "emptyFiltered": "これらの条件に一致するマージリクエストはありません",
+    "filters": {
+      "stateLabel": "マージリクエストの状態",
+      "mineLabel": "自分に関連",
+      "draftLabel": "ドラフトのマージリクエスト",
+      "targetBranch": "ターゲットブランチ",
+      "addLabel": "ラベルを追加…",
+      "noLabels": "ラベルが見つかりません",
+      "removeLabel": "ラベル {label} を外す",
+      "state": {
+        "opened": "オープン",
+        "merged": "マージ済み",
+        "closed": "クローズ",
+        "all": "すべて"
+      },
+      "mine": {
+        "none": "全員",
+        "author": "自分が作成",
+        "assignee": "自分に割り当て",
+        "reviewer": "自分にレビュー依頼"
+      },
+      "draft": {
+        "any": "ドラフトと通常",
+        "only": "ドラフトのみ",
+        "hide": "ドラフトを隠す"
+      }
+    },
     "sort": {
       "label": "並べ替え",
       "recently-updated": "最近更新された順",

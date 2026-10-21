@@ -1,9 +1,9 @@
 import type { CacheRepositories } from '@pulls.review/core/cache'
-import type { GitlabNamespaceKind } from '@pulls.review/core/gitlab'
+import type { GitlabMergeRequestFilters, GitlabNamespaceKind } from '@pulls.review/core/gitlab'
 import type { Credentials, PullRequestListItem, PullRequestListPage, SourceRef } from '@pulls.review/core/types'
 import type { ListedRepository } from '../source-routes'
 import { createGithubClient, fetchOpenPullRequests } from '@pulls.review/core/github'
-import { createGitlabClient, fetchOpenMergeRequests, resolveGitlabNamespace } from '@pulls.review/core/gitlab'
+import { createGitlabClient, DEFAULT_GITLAB_MR_FILTERS, fetchGitlabLabelNames, fetchGitlabUsername, fetchMergeRequests, resolveGitlabNamespace } from '@pulls.review/core/gitlab'
 import { computed, reactive, ref, shallowRef } from 'vue'
 import { ruleBasedAdapter } from '../analyze'
 import { listItemRoute } from '../source-routes'
@@ -21,7 +21,11 @@ export interface ViewedPullRequest {
 export interface PullRequestListStore {
   readonly repository: ListedRepository
   readonly items: PullRequestListItem[]
-  /** Open PR count for the whole repo (not just the loaded pages); unset until the first page lands. */
+  /** What a GitLab list is narrowed to; undefined for GitHub, whose list has no filters. */
+  readonly filters: GitlabMergeRequestFilters | undefined
+  /** Labels a GitLab merge request in this list can carry, for the label filter's choices. */
+  readonly labelOptions: string[]
+  /** PR count for the whole repo, of the chosen state on GitLab (not just the loaded pages); unset until the first page lands. */
   readonly totalCount: number | undefined
   /** First load with nothing to show yet. */
   readonly isLoading: boolean
@@ -33,6 +37,8 @@ export interface PullRequestListStore {
   /** Locally cached diffs of this repo, by the item's `listItemRoute` - numbers repeat across a GitLab group's projects. */
   readonly viewed: ReadonlyMap<string, ViewedPullRequest>
   load: () => Promise<void>
+  /** Replaces the GitLab filters and refetches the first page; the old list is dropped, not kept beside the new one. */
+  setFilters: (filters: GitlabMergeRequestFilters) => Promise<void>
   refresh: () => Promise<void>
   loadMore: () => Promise<void>
   /** Fetches every remaining page - client-side search needs the full set to be trustworthy. */
@@ -42,6 +48,8 @@ export interface PullRequestListStore {
 export interface PullRequestListStoreOptions {
   cache: CacheRepositories
   credentials: Credentials
+  /** The GitLab filters to start from (the page URL's); ignored for GitHub. */
+  filters?: GitlabMergeRequestFilters
 }
 
 /**
@@ -52,18 +60,44 @@ export interface PullRequestListStoreOptions {
  */
 /**
  * A GitLab path's pages: a project's merge requests, or a group's with its subgroups'.
- * Which one it is resolves once, on the first page.
+ * Which one it is resolves once, on the first page, and so does the token's username
+ * (only the "mine" filter needs it).
  */
-function gitlabPages(path: string, client: ReturnType<typeof createGitlabClient>) {
+function gitlabList(path: string, client: ReturnType<typeof createGitlabClient>, currentFilters: () => GitlabMergeRequestFilters) {
   let kind: Promise<GitlabNamespaceKind> | undefined
-  return async (next?: string) => fetchOpenMergeRequests(client, path, next, await (kind ??= resolveGitlabNamespace(client, path)))
+  let username: Promise<string> | undefined
+  const namespace = () => kind ??= resolveGitlabNamespace(client, path)
+  return {
+    async fetchPage(next?: string) {
+      const filters = currentFilters()
+      return fetchMergeRequests(client, path, {
+        filters,
+        username: filters.mine
+          ? await (username ??= fetchGitlabUsername(client).catch((err) => {
+              username = undefined
+              throw err
+            }))
+          : undefined,
+        next,
+        kind: await namespace(),
+      })
+    },
+    async fetchLabelNames() {
+      return fetchGitlabLabelNames(client, path, await namespace())
+    },
+  }
+}
+
+function githubList(owner: string, repo: string, client: ReturnType<typeof createGithubClient>) {
+  return { fetchPage: (next?: string) => fetchOpenPullRequests(client, owner, repo, next), fetchLabelNames: undefined }
 }
 
 export function createPullRequestListStore(repository: ListedRepository, opts: PullRequestListStoreOptions): PullRequestListStore {
   const { cache } = opts
-  const fetchPage = 'host' in repository
-    ? gitlabPages(repository.project, createGitlabClient(repository.host, opts.credentials))
-    : ((client => (next?: string) => fetchOpenPullRequests(client, repository.owner, repository.repo, next))(createGithubClient(opts.credentials)))
+  const filters = ref<GitlabMergeRequestFilters | undefined>('host' in repository ? opts.filters ?? DEFAULT_GITLAB_MR_FILTERS : undefined)
+  const { fetchPage, fetchLabelNames } = 'host' in repository
+    ? gitlabList(repository.project, createGitlabClient(repository.host, opts.credentials), () => filters.value ?? DEFAULT_GITLAB_MR_FILTERS)
+    : githubList(repository.owner, repository.repo, createGithubClient(opts.credentials))
   // The list cache is keyed by GitHub's `owner/repo` and feeds the home page's recent
   // repositories as GitHub links, so a GitLab list is always fetched fresh instead.
   const listCache = 'owner' in repository ? { owner: repository.owner, repo: repository.repo } : undefined
@@ -83,6 +117,7 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
   const isRefreshing = ref(false)
   const isLoadingMore = ref(false)
   const error = ref<Error>()
+  const labelOptions = ref<string[]>([])
   const viewed = shallowRef(new Map<string, ViewedPullRequest>())
   // Bumped by every first-page fetch so a slower, older response can't overwrite a newer list.
   let generation = 0
@@ -132,6 +167,10 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
   async function load() {
     // Independent of the network: what's viewed locally decorates rows whenever they arrive.
     void loadViewed()
+    // Only the filter's choices depend on it, so a failure leaves them empty instead of failing the list.
+    void fetchLabelNames?.().then((names) => {
+      labelOptions.value = names
+    }).catch(() => {})
     const cached = listCache && await cache.pullRequestLists.get(listCache.owner, listCache.repo)
     if (cached && listCache) {
       installFirstPage(cached.page)
@@ -145,6 +184,24 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
     }
     finally {
       flag.value = false
+    }
+  }
+
+  async function setFilters(value: GitlabMergeRequestFilters) {
+    filters.value = value
+    items.value = []
+    totalCount.value = undefined
+    next.value = undefined
+    isLoading.value = true
+    const request = fetchFirstPage()
+    const current = generation
+    try {
+      await request
+    }
+    finally {
+      // A newer filter change owns the loading state now.
+      if (current === generation)
+        isLoading.value = false
     }
   }
 
@@ -194,10 +251,13 @@ export function createPullRequestListStore(repository: ListedRepository, opts: P
     isLoading,
     isRefreshing,
     isLoadingMore,
+    filters,
+    labelOptions,
     hasMore: computed(() => next.value !== undefined),
     error,
     viewed,
     load,
+    setFilters,
     refresh,
     loadMore,
     loadAll,

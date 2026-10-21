@@ -9,6 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { repositoryCrumbs } from '../../source-routes'
 import GithubAvatar from '../GithubAvatar.vue'
 import NavControls from '../NavControls.vue'
+import GitlabFilters from './GitlabFilters.vue'
 import { PULL_REQUEST_SORTS } from './pull-request-list-query'
 
 const props = defineProps<{
@@ -43,7 +44,7 @@ const sortOptions = computed(() => PULL_REQUEST_SORTS.map(value => ({ value, lab
           </a>
           <span class="op-mute">/</span>
           <a :href="crumbs.name.url" target="_blank" rel="noopener" class="hover:underline">{{ crumbs.name.label }}</a>
-          <span v-if="store.totalCount !== undefined" class="ml-1 text-sm font-normal op-fade">{{ $t('pulls.open', { n: store.totalCount }) }}</span>
+          <span v-if="store.totalCount !== undefined" class="ml-1 text-sm font-normal op-fade">{{ store.filters ? $t(`pulls.count.${store.filters.state}`, { n: store.totalCount }) : $t('pulls.open', { n: store.totalCount }) }}</span>
           <ActionIconButton
             icon="i-ph:arrows-clockwise-duotone"
             :label="$t('common.refresh')" :tooltip="$t('common.refresh')"
@@ -59,6 +60,8 @@ const sortOptions = computed(() => PULL_REQUEST_SORTS.map(value => ({ value, lab
         <FormSearchField v-model="query" :placeholder="$t('pulls.search')" size="sm" class="min-w-60 flex-1" />
         <FormSelect v-model="sort" :options="sortOptions" class="min-w-48 h-7!" :aria-label="$t('pulls.sort.label')" />
       </div>
+
+      <GitlabFilters v-if="store.filters" :store="store" :filters="store.filters" />
     </div>
   </header>
 </template>

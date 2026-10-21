@@ -28,7 +28,7 @@ export const PullRequestListItemSchema = v.object({
   repository: v.optional(v.string()),
   title: v.string(),
   url: v.string(), // html permalink on github.com
-  state: v.picklist(['open', 'draft']),
+  state: v.picklist(['open', 'draft', 'merged', 'closed']),
   author: v.optional(CommentAuthorSchema), // absent for deleted ("ghost") accounts
   labels: v.array(PullRequestLabelSchema),
   assignees: v.array(CommentAuthorSchema),

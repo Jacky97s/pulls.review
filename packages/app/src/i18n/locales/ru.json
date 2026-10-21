@@ -149,6 +149,39 @@
     "groups": "{n} группа | {n} группы | {n} групп",
     "viewedHint": "Просмотрен в этом браузере",
     "aiAvailable": "Доступен ИИ-анализ",
+    "count": {
+      "opened": "{n} открыто",
+      "merged": "{n} слито",
+      "closed": "{n} закрыто",
+      "all": "всего {n}"
+    },
+    "emptyFiltered": "Нет merge request, подходящих под эти фильтры",
+    "filters": {
+      "stateLabel": "Состояние merge request",
+      "mineLabel": "Связанные со мной",
+      "draftLabel": "Черновики merge request",
+      "targetBranch": "Целевая ветка",
+      "addLabel": "Добавить метку…",
+      "noLabels": "Метки не найдены",
+      "removeLabel": "Убрать метку {label}",
+      "state": {
+        "opened": "Открытые",
+        "merged": "Слитые",
+        "closed": "Закрытые",
+        "all": "Все"
+      },
+      "mine": {
+        "none": "Любые",
+        "author": "Созданные мной",
+        "assignee": "Назначенные мне",
+        "reviewer": "Ожидающие моего ревью"
+      },
+      "draft": {
+        "any": "Черновики и готовые",
+        "only": "Только черновики",
+        "hide": "Скрыть черновики"
+      }
+    },
     "sort": {
       "label": "Сортировка",
       "recently-updated": "Недавно обновлённые",

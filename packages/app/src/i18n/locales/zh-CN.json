@@ -149,6 +149,39 @@
     "groups": "{n} 个分组",
     "viewedHint": "已在此浏览器中查看",
     "aiAvailable": "有 AI 分析",
+    "count": {
+      "opened": "{n} 个开放",
+      "merged": "{n} 个已合并",
+      "closed": "{n} 个已关闭",
+      "all": "共 {n} 个"
+    },
+    "emptyFiltered": "没有符合这些筛选条件的合并请求",
+    "filters": {
+      "stateLabel": "合并请求状态",
+      "mineLabel": "与我相关",
+      "draftLabel": "草稿合并请求",
+      "targetBranch": "目标分支",
+      "addLabel": "添加标签…",
+      "noLabels": "未找到标签",
+      "removeLabel": "移除标签 {label}",
+      "state": {
+        "opened": "开放",
+        "merged": "已合并",
+        "closed": "已关闭",
+        "all": "全部"
+      },
+      "mine": {
+        "none": "不限",
+        "author": "我创建的",
+        "assignee": "指派给我的",
+        "reviewer": "需要我评审的"
+      },
+      "draft": {
+        "any": "草稿与正式",
+        "only": "仅草稿",
+        "hide": "隐藏草稿"
+      }
+    },
     "sort": {
       "label": "排序",
       "recently-updated": "最近更新",
