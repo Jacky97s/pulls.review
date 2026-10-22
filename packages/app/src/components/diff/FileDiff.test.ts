@@ -114,12 +114,35 @@ describe('automatic full-file fetching', () => {
   })
 })
 
-describe('collapsing on review', () => {
+describe('file collapse state', () => {
+  it('keeps a file expanded when its saved review mark is set', async () => {
+    const store = createMockDiffsStore({ reviewed: [file.sha] })
+    wrapper = mount(FileDiff, { props: { store, file }, global: { plugins: [i18n] } })
+    await nextTick()
+
+    expect(wrapper.find('[aria-label="Collapse file"]').exists()).toBe(true)
+    expect(wrapper.find('[aria-label="Expand file"]').exists()).toBe(false)
+  })
+
+  it('keeps a file expanded when it is marked reviewed', async () => {
+    const store = createMockDiffsStore({})
+    wrapper = mount(FileDiff, { props: { store, file }, global: { plugins: [i18n] } })
+    await nextTick()
+
+    await store.setReviewed([file.sha], true)
+    await flushPromises()
+
+    expect(wrapper.find('[aria-label="Collapse file"]').exists()).toBe(true)
+    expect(wrapper.find('[aria-label="Expand file"]').exists()).toBe(false)
+  })
+})
+
+describe('collapsing a file', () => {
   afterEach(() => {
     document.body.innerHTML = ''
   })
 
-  async function markReviewedWithMarkerAt(top: number) {
+  async function mountWithMarkerAt(top: number) {
     const marker = document.createElement('div')
     marker.dataset.fileStart = file.sha
     marker.getBoundingClientRect = () => ({ top }) as DOMRect
@@ -128,18 +151,20 @@ describe('collapsing on review', () => {
     const store = createMockDiffsStore({})
     wrapper = mount(FileDiff, { props: { store, file }, global: { plugins: [i18n] }, attachTo: document.body })
     await nextTick()
-    await store.setReviewed([file.sha], true)
-    await flushPromises()
     return marker
   }
 
   it('pins a file scrolled past its start back to the top', async () => {
-    const marker = await markReviewedWithMarkerAt(-2000)
+    const marker = await mountWithMarkerAt(-2000)
+    await wrapper!.get('[aria-label="Collapse file"]').trigger('click')
+    await flushPromises()
     expect(marker.scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start' })
   })
 
   it('leaves the scroll alone when the file starts in view', async () => {
-    const marker = await markReviewedWithMarkerAt(300)
+    const marker = await mountWithMarkerAt(300)
+    await wrapper!.get('[aria-label="Collapse file"]').trigger('click')
+    await flushPromises()
     expect(marker.scrollIntoView).not.toHaveBeenCalled()
   })
 })
