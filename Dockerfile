@@ -26,6 +26,9 @@ RUN pnpm -F @pulls.review/app run build
 
 # Last, so a plain `docker build` produces the site.
 FROM nginx:1.29-alpine AS site
+RUN apk add --no-cache jq
+COPY deploy/site-runtime-config.sh /docker-entrypoint.d/40-site-runtime-config.sh
+RUN chmod +x /docker-entrypoint.d/40-site-runtime-config.sh
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/packages/app/dist /usr/share/nginx/html
 EXPOSE 80

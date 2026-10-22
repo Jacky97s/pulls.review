@@ -121,6 +121,18 @@ GIT_SHA=$(git rev-parse --short HEAD) PORT=8080 \
 docker compose up -d --build
 ```
 
+For the Docker-hosted browser app, optional `.env` values set first-visit defaults:
+
+```dotenv
+PULLS_REVIEW_PROVIDER=anthropic # gateway, anthropic, or openai-compatible
+PULLS_REVIEW_API_KEY=...
+PULLS_REVIEW_MODEL=claude-sonnet-5
+PULLS_REVIEW_BASE_URL=https://api.openai.com/v1 # openai-compatible only
+PULLS_REVIEW_LOCALE=zh-TW
+```
+
+`PULLS_REVIEW_PROVIDER` is the provider name, not the key. The key belongs in `PULLS_REVIEW_API_KEY`; alternatively, use `AI_GATEWAY_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY` and leave the provider unset for automatic selection. The runtime config is served to browsers, so every visitor who can access this site can inspect and use the configured key. Compose values seed LLM settings when the browser has no saved key; an existing saved key or language remains active until changed in Settings. After changing `.env`, run `docker compose up -d --build` to recreate the service with the new values.
+
 - `VITE_GITLAB_OAUTH_CLIENTS` (optional): `host=id` pairs, comma-separated, for "Sign in with GitLab". Register the application on that instance as **not confidential**, scope `api`, redirect URI `https://<this site>/oauth/gitlab`. It is built into the bundle, so rebuild after changing it.
 - Without it, users paste a personal access token per instance in Settings → GitLab.
 - The browser calls each GitLab instance directly, so the instance must allow CORS from this site (GitLab's API does by default).

@@ -27,3 +27,14 @@ interface ImportMetaEnv {
   /** Short git sha the embed bundle was built from; only defined by `vite.config.embed.ts`. */
   readonly PR_EMBED_SHA: string | undefined
 }
+
+interface Window {
+  /** Optional server-wide defaults written by Docker Compose at container startup. */
+  __PULLS_REVIEW_CONFIG__?: {
+    provider?: string
+    apiKey?: string
+    model?: string
+    baseUrl?: string
+    locale?: string
+  }
+}

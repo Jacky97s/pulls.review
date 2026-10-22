@@ -11,6 +11,16 @@ services:
         GIT_SHA: ${GIT_SHA:-unknown}
     ports:
       - '${PORT:-8080}:80'
+    environment:
+      PULLS_REVIEW_PROVIDER: ${PULLS_REVIEW_PROVIDER:-}
+      PULLS_REVIEW_API_KEY: ${PULLS_REVIEW_API_KEY:-}
+      PULLS_REVIEW_MODEL: ${PULLS_REVIEW_MODEL:-}
+      PULLS_REVIEW_BASE_URL: ${PULLS_REVIEW_BASE_URL:-}
+      PULLS_REVIEW_LOCALE: ${PULLS_REVIEW_LOCALE:-}
+      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
     restart: unless-stopped
 
   nginx-https:
