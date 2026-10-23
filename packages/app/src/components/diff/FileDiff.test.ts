@@ -9,11 +9,19 @@ import FileDiff from './FileDiff.vue'
 
 vi.mock('@pierre/diffs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@pierre/diffs')>()
+  // Mirrors pierre 1.6's contract: the 3rd constructor arg is an owner render callback,
+  // which switches the instance to component-managed rendering (no slotted annotations).
   class FileDiff {
+    static instances: FileDiff[] = []
+    constructor(_options?: unknown, _worker?: unknown, readonly requestOwnerRender?: () => void) {
+      FileDiff.instances.push(this)
+    }
+
     render() {}
     cleanUp() {}
     setOptions() {}
     rerender() {}
+    requestRender() { this.requestOwnerRender?.() }
   }
   return { ...actual, FileDiff, VirtualizedFileDiff: FileDiff }
 })
@@ -134,6 +142,19 @@ describe('file collapse state', () => {
 
     expect(wrapper.find('[aria-label="Collapse file"]').exists()).toBe(true)
     expect(wrapper.find('[aria-label="Expand file"]').exists()).toBe(false)
+  })
+})
+
+describe('pierre instance', () => {
+  it('is created without an owner render callback', async () => {
+    const store = createMockDiffsStore({})
+    wrapper = mount(FileDiff, { props: { store, file }, global: { plugins: [i18n] } })
+    await nextTick()
+    const { instances } = (await import('@pierre/diffs')).VirtualizedFileDiff as unknown as { instances: { requestOwnerRender?: unknown }[] }
+
+    expect(instances.length).toBeGreaterThan(0)
+    for (const instance of instances)
+      expect(instance.requestOwnerRender).toBeUndefined()
   })
 })
 

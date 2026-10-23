@@ -337,10 +337,14 @@ const pierreOptions = computed((): FileDiffOptions<undefined, undefined> => ({
 function mount() {
   // Recreated on every render rather than reused + `setOptions()`: switching `diffStyle`
   // (unified/split) on an existing instance left stale, un-columned DOM behind. `cleanUp()`
-  // would otherwise `.remove()` our own template-owned container from the DOM entirely
-  // (its default assumption is that it created the container itself) - the third
-  // `isContainerManaged: true` constructor arg opts out of that.
+  // `.remove()`s our own template-owned container (it assumes it created it), and the only
+  // opt-out, a render callback, switches pierre to component-managed rendering that drops
+  // our slotted annotations - so put the container back instead.
+  const container = containerRef.value
+  const { parentNode, nextSibling } = container ?? {}
   instance?.cleanUp()
+  if (container && parentNode && !container.isConnected)
+    parentNode.insertBefore(container, nextSibling ?? null)
   selectedRange.value = undefined
 
   if (!containerRef.value || props.file.isBinary || collapsed.value || !fileDiff.value)
@@ -352,8 +356,8 @@ function mount() {
   // `themeType`: defaults to `'system'` (OS-level `prefers-color-scheme`) otherwise,
   // ignoring our own dark-mode toggle entirely - pin it to the app's actual state.
   instance = virtualizer
-    ? new VirtualizedFileDiff(pierreOptions.value, virtualizer, undefined, undefined, true)
-    : new PierreFileDiff(pierreOptions.value, undefined, true)
+    ? new VirtualizedFileDiff(pierreOptions.value, virtualizer)
+    : new PierreFileDiff(pierreOptions.value)
 
   instance.render({
     fileDiff: fileDiff.value,
